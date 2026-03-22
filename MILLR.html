@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MILLR — Milling Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c12;--surface:#0f1620;--panel:#131d28;
+  --border:#1a2d40;--accent:#f59e0b;--a2:#38bdf8;--gr:#22c55e;
+  --rd:#ef4444;--wn:#f97316;--pu:#a78bfa;--pk:#f472b6;
+  --tx:#e2e8f0;--mt:#64748b;--dm:#374151;
+  --mono:'Share Tech Mono',monospace;--hd:'Barlow Condensed',sans-serif;--bd:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:var(--bd);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(56,189,248,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:18px 14px 80px;}
+
+/* HEADER */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.htag{font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.15em;margin-bottom:3px;}
+.htitle{font-family:var(--hd);font-size:36px;font-weight:900;letter-spacing:.02em;color:#fff;line-height:1;}
+.htitle span{color:var(--accent);}
+.hsub{font-size:12px;color:var(--mt);margin-top:3px;font-weight:300;}
+.hright{display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
+.badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border:1px solid var(--gr);color:var(--gr);border-radius:2px;letter-spacing:.1em;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.utog{display:flex;align-items:center;gap:6px;}
+.utog button{padding:4px 12px;border:1px solid var(--border);background:transparent;color:var(--mt);cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.07em;border-radius:2px;transition:all .2s;}
+.utog button.active{background:var(--accent);border-color:var(--accent);color:#000;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:16px;border-bottom:1px solid var(--border);overflow-x:auto;padding-bottom:0;}
+.tab{font-family:var(--mono);font-size:10px;padding:7px 14px;border:none;background:transparent;color:var(--mt);cursor:pointer;letter-spacing:.07em;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.tc{display:none;animation:fadein .2s ease;}.tc.on{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+@media(max-width:860px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* PANEL */
+.p{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:16px;position:relative;overflow:hidden;}
+.p::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--a2),transparent);}
+.pa::before{background:linear-gradient(90deg,var(--accent),transparent);}
+.pg::before{background:linear-gradient(90deg,var(--gr),transparent);}
+.pr::before{background:linear-gradient(90deg,var(--rd),transparent);}
+.pp::before{background:linear-gradient(90deg,var(--pu),transparent);}
+.pk::before{background:linear-gradient(90deg,var(--pk),transparent);}
+.pl{font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pl::after{content:'';flex:1;height:1px;background:var(--border);}
+.pa .pl{color:var(--accent);}.pg .pl{color:var(--gr);}.pr .pl{color:var(--rd);}.pp .pl{color:var(--pu);}.pk .pl{color:var(--pk);}
+
+/* FORM */
+.fi{margin-bottom:10px;}.fi:last-child{margin-bottom:0;}
+label{display:block;font-size:11px;font-weight:500;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+select,input[type=number],input[type=text]{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--tx);font-family:var(--mono);font-size:13px;padding:7px 10px;border-radius:3px;outline:none;transition:border-color .2s;appearance:none;}
+select:focus,input:focus{border-color:var(--a2);}
+.sw{position:relative;}.sw::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--mt);pointer-events:none;font-size:11px;}
+.uh{font-size:10px;color:var(--mt);font-family:var(--mono);margin-top:2px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+
+/* RESULTS */
+.rv{font-family:var(--mono);font-size:28px;color:var(--accent);line-height:1;}
+.rv.b{color:var(--a2);}.rv.g{color:var(--gr);}.rv.r{color:var(--rd);}.rv.p{color:var(--pu);}
+.ru{font-size:12px;color:var(--mt);margin-left:2px;}
+.rs{font-size:11px;color:var(--mt);font-family:var(--mono);margin-top:2px;}
+.rb{margin-bottom:12px;}
+.gbar{margin-top:6px;height:4px;background:var(--dm);border-radius:2px;overflow:hidden;}
+.gf{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.gl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--mt);margin-top:2px;}
+
+/* ALERT */
+.al{padding:8px 12px;border-radius:3px;font-size:11px;font-family:var(--mono);margin-top:7px;border-left:3px solid;line-height:1.5;}
+.aok{border-color:var(--gr);background:rgba(34,197,94,.06);color:var(--gr);}
+.aw{border-color:var(--wn);background:rgba(249,115,22,.06);color:var(--wn);}
+.ae{border-color:var(--rd);background:rgba(239,68,68,.06);color:var(--rd);}
+.ai{border-color:var(--a2);background:rgba(56,189,248,.06);color:var(--a2);}
+.ap{border-color:var(--pu);background:rgba(167,139,250,.06);color:var(--pu);}
+
+/* BUTTON */
+.btn{width:100%;padding:12px;background:var(--accent);color:#000;font-family:var(--hd);font-size:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;transition:all .15s;}
+.btn:hover{background:#fbbf24;transform:translateY(-1px);}
+.btn-sm{padding:5px 12px;font-size:11px;border:1px solid var(--border);background:transparent;color:var(--mt);font-family:var(--mono);border-radius:2px;cursor:pointer;transition:all .2s;letter-spacing:.07em;}
+.btn-sm:hover{border-color:var(--accent);color:var(--accent);}
+.btn-add{padding:6px 14px;background:rgba(56,189,248,.1);border:1px solid var(--a2);color:var(--a2);font-family:var(--mono);font-size:11px;border-radius:2px;cursor:pointer;transition:all .2s;}
+.btn-add:hover{background:rgba(56,189,248,.2);}
+.btn-del{padding:4px 8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:var(--rd);font-family:var(--mono);font-size:10px;border-radius:2px;cursor:pointer;}
+
+/* TABLE */
+.tb{width:100%;border-collapse:collapse;font-size:11px;}
+.tb th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--mt);text-align:left;padding:5px 7px;border-bottom:1px solid var(--border);}
+.tb td{padding:5px 7px;font-family:var(--mono);font-size:11px;border-bottom:1px solid rgba(26,45,64,.4);}
+.tb tr:last-child td{border-bottom:none;}
+.tb td:first-child{color:var(--mt);}
+.tb td:last-child{color:var(--a2);text-align:right;}
+.tb .hi td:last-child{color:var(--accent);font-size:13px;}
+.tb .wr td{color:var(--wn)!important;}
+.tb .ok td:last-child{color:var(--gr)!important;}
+
+/* SECTION */
+.st{font-family:var(--hd);font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:.15em;margin:16px 0 10px;display:flex;align-items:center;gap:10px;}
+.st::before,.st::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* CHIPS */
+.chs{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+.ch{font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:2px;border:1px solid;}
+.cb{border-color:var(--a2);color:var(--a2);background:rgba(56,189,248,.06);}
+.ca{border-color:var(--accent);color:var(--accent);background:rgba(245,158,11,.06);}
+.cg{border-color:var(--gr);color:var(--gr);background:rgba(34,197,94,.06);}
+.cr{border-color:var(--rd);color:var(--rd);background:rgba(239,68,68,.06);}
+.cp{border-color:var(--pu);color:var(--pu);background:rgba(167,139,250,.06);}
+
+/* BHA DESIGNER */
+.bha-slot{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;position:relative;}
+.bha-slot:hover{border-color:var(--a2);}
+.bha-pos-badge{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.1em;margin-bottom:6px;}
+.bha-slot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;}
+@media(max-width:700px){.bha-slot-grid{grid-template-columns:1fr 1fr;}}
+.bha-result{border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;background:var(--surface);}
+.bha-r-pos{font-family:var(--mono);font-size:9px;color:var(--accent);margin-bottom:3px;}
+.bha-r-name{font-family:var(--hd);font-size:14px;font-weight:700;margin-bottom:2px;}
+.bha-r-spec{font-size:11px;color:var(--mt);font-family:var(--mono);}
+.bha-r-note{font-size:11px;color:var(--a2);margin-top:4px;line-height:1.4;}
+.bha-type-badge{display:inline-block;font-family:var(--mono);font-size:11px;padding:4px 12px;border-radius:2px;border:1px solid;margin-bottom:10px;}
+
+/* MILL CARDS */
+.mc{border:1px solid var(--border);border-radius:4px;padding:11px;background:var(--surface);margin-bottom:7px;}
+.mc.best{border-color:var(--accent);}
+.mc.good{border-color:var(--gr);}
+.mc.poor{border-color:var(--dm);opacity:.6;}
+.mc-name{font-family:var(--hd);font-size:14px;font-weight:700;margin-bottom:2px;}
+.mc-stars span{font-size:12px;}
+
+/* VIS TABLE */
+.vt{width:100%;border-collapse:collapse;}
+.vt th{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--mt);padding:5px 7px;border-bottom:1px solid var(--border);text-align:center;}
+.vt td{padding:5px 7px;font-family:var(--mono);font-size:11px;text-align:center;border-bottom:1px solid rgba(26,45,64,.4);}
+.vt td:first-child{text-align:left;color:var(--mt);}
+
+/* HELP */
+.help-section{margin-bottom:20px;}
+.help-title{font-family:var(--hd);font-size:18px;font-weight:700;color:var(--accent);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.help-formula{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:8px;}
+.help-formula-name{font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.1em;margin-bottom:6px;}
+.help-formula-eq{font-family:var(--mono);font-size:14px;color:var(--accent);margin-bottom:6px;padding:8px;background:var(--bg);border-radius:3px;}
+.help-formula-desc{font-size:12px;color:var(--mt);line-height:1.6;}
+.help-formula-vars{font-size:11px;color:var(--mt);font-family:var(--mono);margin-top:5px;line-height:1.7;}
+
+/* FLOW DISPLAY */
+.flow-dual{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
+.flow-box{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;}
+.flow-big{font-family:var(--mono);font-size:22px;line-height:1;}
+.flow-lbl{font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+
+/* DLS */
+.dls-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:560px){.dls-cards{grid-template-columns:1fr;}}
+.dls-c{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:12px;text-align:center;}
+.dls-v{font-family:var(--mono);font-size:22px;color:var(--pu);}
+.dls-l{font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="htag">Downhole Milling Intelligence · Wells Engineering</div>
+    <div class="htitle">MILL<span>R</span></div>
+    <div class="hsub">RPM · WOB · Flow · Viscosity · BHA Designer · DLS · Material · Help</div>
+    <div style="margin-top:7px;display:flex;align-items:center;gap:8px;">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em;">© 2025 BALA</span>
+      <span style="width:3px;height:3px;border-radius:50%;background:var(--mt);display:inline-block;"></span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--mt);letter-spacing:.08em;">All Rights Reserved</span>
+      <span style="width:3px;height:3px;border-radius:50%;background:var(--mt);display:inline-block;"></span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--mt);letter-spacing:.08em;">Petroleum Engineer · Wells</span>
+    </div>
+  </div>
+  <div class="hright">
+    <a href="WellSuite_Index.html" style="padding:6px 14px;background:transparent;
+      border:1px solid var(--border);color:var(--mt);font-family:var(--mono);
+      font-size:10px;border-radius:2px;text-decoration:none;letter-spacing:.07em;
+      transition:all .2s;white-space:nowrap;"
+      onmouseover="this.style.borderColor='#f59e0b';this.style.color='#f59e0b'"
+      onmouseout="this.style.borderColor='';this.style.color=''">
+      ← WELLSUITE
+    </a>
+    <div class="badge">● LIVE</div>
+    <div class="utog">
+      <span style="color:var(--mt);font-size:10px;font-family:var(--mono)">UNITS:</span>
+      <button class="active" id="bf" onclick="setU('field')">FIELD</button>
+      <button id="bm" onclick="setU('metric')">METRIC</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="ST('t1')">⚙ Setup</button>
+  <button class="tab" onclick="ST('t2')">💧 Fluid & Flow</button>
+  <button class="tab" onclick="ST('t3')">📐 Survey & DLS</button>
+  <button class="tab" onclick="ST('t4')">📊 Results</button>
+  <button class="tab" onclick="ST('t5')">🔩 Mill Guide</button>
+  <button class="tab" onclick="ST('t6')">🔧 BHA Designer</button>
+  <button class="tab" onclick="ST('t7')">❓ Help & Formulas</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 1 — SETUP -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t1" class="tc on">
+  <div class="g2">
+    <div class="p pa">
+      <div class="pl">Mill Specification</div>
+      <div class="fi"><label>Mill Type</label>
+        <div class="sw"><select id="millType" onchange="C()">
+          <option value="flat_bottom">Flat Bottom Mill</option>
+          <option value="taper">Taper Mill</option>
+          <option value="watermelon">Watermelon Mill</option>
+          <option value="junk">Junk Mill (Bladed)</option>
+          <option value="section">Section Mill</option>
+          <option value="packer">Packer Mill</option>
+          <option value="pilot">Pilot Mill</option>
+          <option value="two_pod">Two-Pod Mill (NOV Muncher)</option>
+        </select></div>
+      </div>
+      <div class="fi"><label id="lod">Mill OD (inches)</label>
+        <input type="number" id="millOD" value="6" step="0.125" min="2" max="14" oninput="C()">
+      </div>
+      <div class="fi"><label>Mill Insert Type</label>
+        <div class="sw"><select id="millMat" onchange="C()">
+          <option value="tcr">TCR — Tungsten Carbide Round</option>
+          <option value="tcs">TCS — Tungsten Carbide Sharp</option>
+          <option value="diamond">PDC / Diamond Insert</option>
+          <option value="milled_tooth">Milled Tooth</option>
+          <option value="muncher">NOV Muncher Blade</option>
+        </select></div>
+      </div>
+      <div class="fi"><label>Material Being Milled</label>
+        <div class="sw"><select id="fishMaterial" onchange="C()">
+          <option value="MS">Mild Steel (MS) — J55 / K55</option>
+          <option value="CS">Carbon Steel — N80 / L80</option>
+          <option value="HS">High Strength Steel — P110 / Q125</option>
+          <option value="SS">Stainless Steel (SS) 316 / 304</option>
+          <option value="13Cr">13 Chrome (13Cr)</option>
+          <option value="Inconel">Inconel 625 / 718</option>
+          <option value="CastIron">Cast Iron (Bridge Plug)</option>
+          <option value="Composite">Composite / Fiberglass</option>
+          <option value="Rubber">Rubber / Elastomer</option>
+        </select></div>
+        <div class="uh" id="mat-hint">N80 standard casing — moderate hardness</div>
+      </div>
+    </div>
+
+    <div class="p">
+      <div class="pl">Casing & Target</div>
+      <div class="fi"><label id="lcs">Casing Size (inches)</label>
+        <div class="sw"><select id="casingSize" onchange="updCW();C()">
+          <option value="4.5">4½"</option><option value="5">5"</option>
+          <option value="5.5">5½"</option><option value="7" selected>7"</option>
+          <option value="9.625">9⅝"</option><option value="13.375">13⅜"</option>
+        </select></div>
+      </div>
+      <div class="fi"><label>Casing Weight (lb/ft)</label>
+        <div class="sw"><select id="casingWt" onchange="C()"></select></div>
+      </div>
+      <div class="fi"><label>Casing / Pipe Grade</label>
+        <div class="sw"><select id="pipeGrade" onchange="C()">
+          <option value="J55">J-55</option><option value="K55">K-55</option>
+          <option value="N80" selected>N-80</option><option value="L80">L-80</option>
+          <option value="P110">P-110</option><option value="Q125">Q-125</option>
+        </select></div>
+      </div>
+      <div class="fi"><label>Target Fish Type</label>
+        <div class="sw"><select id="targetObj" onchange="C();updMills()">
+          <option value="casing_tubular">Casing / Tubular (free)</option>
+          <option value="casing_cemented">Cemented Tubular</option>
+          <option value="packer_mech">Packer — Mechanical Set</option>
+          <option value="packer_hydr">Packer — Hydraulic/Permanent</option>
+          <option value="pcp_stator">PCP Stator (SS — Stainless Steel)</option>
+          <option value="pcp_rotor">PCP Rotor (Chrome Plated — Hard)</option>
+          <option value="esp_motor">ESP Motor Housing</option>
+          <option value="junk_metal">Junk / Metal Debris</option>
+          <option value="bridge_plug">Bridge Plug / Cement Retainer</option>
+          <option value="whipstock">Whipstock / Anchor</option>
+          <option value="drillstring">Stuck Drillstring / BHA</option>
+        </select></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="p">
+      <div class="pl">Rig & Well Data</div>
+      <div class="fi"><label id="ldp">Mill Depth (ft MD)</label>
+        <input type="number" id="millDepth" value="3000" step="100" oninput="C()">
+      </div>
+      <div class="fi"><label>Milling Inclination (°)</label>
+        <input type="number" id="millingInc" value="20" step="1" min="0" max="90" oninput="C()">
+        <div class="uh">0°= vertical · 90°= horizontal</div>
+      </div>
+      <div class="fi"><label id="lmt">Max Surface Torque (ft-lbs)</label>
+        <input type="number" id="maxTorque" value="8000" step="500" oninput="C()">
+      </div>
+      <div class="fi"><label id="lhp">Rig HP</label>
+        <div class="sw"><select id="rigHP" onchange="C()">
+          <option value="150">150 HP</option><option value="250">250 HP</option>
+          <option value="350">350 HP</option><option value="550" selected>550 HP</option>
+          <option value="750">750 HP</option><option value="1000">1000 HP</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="p" style="display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div class="pl">Quick Actions</div>
+        <button class="btn" onclick="ST('t4');C()" style="margin-bottom:8px;">▶ CALCULATE NOW</button>
+        <button class="btn-sm" onclick="ST('t6')" style="width:100%;margin-bottom:6px;">🔧 Open BHA Designer</button>
+        <button class="btn-sm" onclick="ST('t7')" style="width:100%;">❓ Open Help & Formulas</button>
+      </div>
+      <div id="mat-card" class="al ai" style="margin-top:10px;font-size:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 2 — FLUID & FLOW -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t2" class="tc">
+  <div class="g2">
+    <div class="p">
+      <div class="pl">Fluid Properties</div>
+      <div class="fi"><label id="lmw">Mud Weight (ppg)</label>
+        <input type="number" id="mudWt" value="9.5" step="0.1" min="7" max="18" oninput="C()">
+      </div>
+      <div class="fi"><label id="lfr">Circulation Rate (gpm)</label>
+        <input type="number" id="flowRate" value="3" step="0.5" min="0.5" max="20" oninput="C()">
+        <div class="uh">Enter in GPM — BPM shown automatically</div>
+      </div>
+      <div class="fi"><label>Fluid Type</label>
+        <div class="sw"><select id="fluidType" onchange="C()">
+          <option value="wbm">Water Base Mud (WBM)</option>
+          <option value="obm">Oil Base Mud (OBM)</option>
+          <option value="sbm">Synthetic Base Mud (SBM)</option>
+          <option value="brine">Brine / Completion Fluid</option>
+          <option value="water">Fresh / Salt Water</option>
+        </select></div>
+      </div>
+    </div>
+
+    <!-- FLOW DISPLAY PANEL -->
+    <div class="p pg">
+      <div class="pl">Live Flow Rate Display</div>
+      <div class="flow-dual">
+        <div class="flow-box">
+          <div class="flow-big" id="disp-gpm" style="color:var(--gr)">3.0</div>
+          <div class="flow-lbl">GPM</div>
+        </div>
+        <div class="flow-box">
+          <div class="flow-big" id="disp-bpm" style="color:var(--a2)">0.07</div>
+          <div class="flow-lbl">BPM</div>
+        </div>
+        <div class="flow-box">
+          <div class="flow-big" id="disp-lpm" style="color:var(--pu)">11.4</div>
+          <div class="flow-lbl">L/min</div>
+        </div>
+      </div>
+      <div style="margin-top:6px;">
+        <div style="font-size:10px;color:var(--mt);font-family:var(--mono);margin-bottom:4px;">MIN REQUIRED vs ACTUAL</div>
+        <div class="gbar"><div class="gf" id="gf-flow" style="background:var(--gr)"></div></div>
+        <div class="gl"><span>0</span><span id="gl-flow-max">20 gpm</span></div>
+        <div id="flow-status" class="al aok" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISCOSITY SECTION -->
+  <div class="st">Field Viscosity — No Viscometer Required</div>
+  <div class="g2">
+    <div class="p pp">
+      <div class="pl">Viscosity in Seconds (Field Method)</div>
+      <div class="al ai" style="margin-bottom:10px;font-size:10px;">
+        Field Method: Use Marsh Funnel or any calibrated funnel. Pour 1 quart (946ml). Time the flow in seconds. Water = 26 sec/qt. Higher = thicker fluid.
+      </div>
+      <div class="fi"><label>Marsh Funnel Reading (sec/qt)</label>
+        <input type="number" id="marshSec" value="42" step="1" min="26" max="200" oninput="C()">
+        <div class="uh">Water baseline = 26 sec/qt · Typical milling mud = 38–60 sec</div>
+      </div>
+      <div class="fi"><label>Field Funnel / Cup Viscosity (sec)</label>
+        <input type="number" id="fieldSec" value="55" step="1" min="10" max="300" oninput="C()">
+        <div class="uh">IMCO/OFI cup, Stormer, or any timed-flow device</div>
+      </div>
+      <div class="fi"><label>Temperature at Surface (°F)</label>
+        <input type="number" id="tempF" value="85" step="1" min="50" max="200" oninput="C()">
+        <div class="uh">Viscosity is temperature-dependent — warmer = thinner</div>
+      </div>
+      <!-- Converted results -->
+      <div class="g2" style="margin-top:10px;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px;text-align:center;">
+          <div style="font-family:var(--mono);font-size:20px;color:var(--pu)" id="vis-conv-pv">—</div>
+          <div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;">Est. PV (cP)</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:10px;text-align:center;">
+          <div style="font-family:var(--mono);font-size:20px;color:var(--accent)" id="vis-conv-yp">—</div>
+          <div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;">Est. YP (lb/100ft²)</div>
+        </div>
+      </div>
+      <div id="vis-field-note" class="al ai" style="margin-top:8px;font-size:10px;"></div>
+    </div>
+
+    <div class="p">
+      <div class="pl">Lab Rheology (If Available)</div>
+      <div class="al ai" style="margin-bottom:10px;font-size:10px;">Optional — fill if you have a Fann VG meter. These override the field estimates above.</div>
+      <div class="fi"><label>Plastic Viscosity — PV (cP)</label>
+        <input type="number" id="pvVal" value="" step="1" min="1" max="100" placeholder="From Fann: θ600 − θ300" oninput="C()">
+      </div>
+      <div class="fi"><label>Yield Point — YP (lb/100ft²)</label>
+        <input type="number" id="ypVal" value="" step="1" min="0" max="60" placeholder="From Fann: θ300 − PV" oninput="C()">
+      </div>
+      <div class="fi"><label>Gel 10sec / 10min (lb/100ft²)</label>
+        <div class="row2">
+          <input type="number" id="gel10s" value="8" step="1" placeholder="10 sec" oninput="C()">
+          <input type="number" id="gel10m" value="16" step="1" placeholder="10 min" oninput="C()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIS ASSESSMENT TABLE -->
+  <div class="st">Viscosity Assessment for Milling</div>
+  <div class="p">
+    <div class="pl">Rheology vs Milling Requirements</div>
+    <table class="vt" id="vis-tbl">
+      <thead>
+        <tr><th>Parameter</th><th>Your Value</th><th>Min</th><th>Max</th><th>Status</th><th>Milling Implication</th></tr>
+      </thead>
+      <tbody id="vis-tbody"></tbody>
+    </table>
+    <div id="vis-summ" class="al ai" style="margin-top:8px;display:none;"></div>
+  </div>
+
+  <!-- FLOW GUIDE -->
+  <div class="st">Minimum Flow Rate by Deviation</div>
+  <div class="g2">
+    <div class="p pg">
+      <div class="pl">Min Flow Result</div>
+      <div class="flow-dual" style="margin-bottom:6px;">
+        <div class="flow-box">
+          <div class="flow-big" id="mf-gpm" style="color:var(--gr)">—</div>
+          <div class="flow-lbl">GPM min</div>
+        </div>
+        <div class="flow-box">
+          <div class="flow-big" id="mf-bpm" style="color:var(--a2)">—</div>
+          <div class="flow-lbl">BPM min</div>
+        </div>
+        <div class="flow-box">
+          <div class="flow-big" id="mf-lpm" style="color:var(--pu)">—</div>
+          <div class="flow-lbl">L/min min</div>
+        </div>
+      </div>
+      <div id="mf-alert" class="al aok" style="display:none;"></div>
+    </div>
+    <div class="p">
+      <div class="pl">Flow Guide by Angle</div>
+      <table class="tb" id="fgt">
+        <thead><tr><th>Angle</th><th>Min AV</th><th>Min GPM</th><th>Min BPM</th><th>Status</th></tr></thead>
+        <tbody id="fgt-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 3 — SURVEY & DLS -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t3" class="tc">
+  <div class="st">3-Point Dogleg Severity Calculator</div>
+  <div class="g3">
+    <div class="p"><div class="pl">Point 1 — Upper Survey</div>
+      <div class="fi"><label id="lm1">MD-1 (ft)</label><input type="number" id="md1" value="2800" oninput="calcDLS()"></div>
+      <div class="fi"><label>Inclination-1 (°)</label><input type="number" id="inc1" value="15" step="0.1" oninput="calcDLS()"></div>
+      <div class="fi"><label>Azimuth-1 (°)</label><input type="number" id="az1" value="120" step="0.1" oninput="calcDLS()"></div>
+    </div>
+    <div class="p"><div class="pl">Point 2 — Mill Depth</div>
+      <div class="fi"><label id="lm2">MD-2 (ft)</label><input type="number" id="md2" value="3000" oninput="calcDLS()"></div>
+      <div class="fi"><label>Inclination-2 (°)</label><input type="number" id="inc2" value="20" step="0.1" oninput="calcDLS()"></div>
+      <div class="fi"><label>Azimuth-2 (°)</label><input type="number" id="az2" value="122" step="0.1" oninput="calcDLS()"></div>
+    </div>
+    <div class="p"><div class="pl">Point 3 — Lower Survey</div>
+      <div class="fi"><label id="lm3">MD-3 (ft)</label><input type="number" id="md3" value="3200" oninput="calcDLS()"></div>
+      <div class="fi"><label>Inclination-3 (°)</label><input type="number" id="inc3" value="25" step="0.1" oninput="calcDLS()"></div>
+      <div class="fi"><label>Azimuth-3 (°)</label><input type="number" id="az3" value="124" step="0.1" oninput="calcDLS()"></div>
+    </div>
+  </div>
+  <div class="dls-cards">
+    <div class="dls-c"><div class="dls-v" id="dls12">—</div><div class="dls-l">DLS Pt1→Pt2 (°/100ft)</div></div>
+    <div class="dls-c"><div class="dls-v" id="dls23">—</div><div class="dls-l">DLS Pt2→Pt3 (°/100ft)</div></div>
+    <div class="dls-c"><div class="dls-v" id="dlsavg" style="color:var(--accent)">—</div><div class="dls-l">Avg DLS at Mill (°/100ft)</div></div>
+  </div>
+  <div id="dls-assess" class="al ai" style="display:none;margin-bottom:12px;"></div>
+
+  <div class="g2">
+    <div class="p pp">
+      <div class="pl">Deviation Impact Table</div>
+      <table class="tb">
+        <thead><tr><th>Effect</th><th>Vertical 0°</th><th>At Your Inc.</th><th>Implication</th></tr></thead>
+        <tbody id="dev-tbody"></tbody>
+      </table>
+    </div>
+    <div class="p">
+      <div class="pl">BHA Type for This DLS</div>
+      <div id="dls-bha-rec"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 4 — RESULTS -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t4" class="tc">
+  <div class="g2">
+    <div class="p pa">
+      <div class="pl">Primary Parameters</div>
+      <div class="rb">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Maximum RPM</div>
+        <div class="rv" id="r-rpm">—<span class="ru">RPM</span></div>
+        <div class="rs" id="r-rpm-rng">Optimal: —</div>
+        <div class="gbar"><div class="gf" id="g-rpm" style="background:var(--accent)"></div></div>
+        <div class="gl"><span>0</span><span id="g-rpm-mx">200</span></div>
+      </div>
+      <div class="rb" style="margin-top:12px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Maximum WOB</div>
+        <div class="rv b" id="r-wob">—<span class="ru">klbs</span></div>
+        <div class="rs" id="r-wob-rng">Optimal: —</div>
+        <div class="gbar"><div class="gf" id="g-wob" style="background:var(--a2)"></div></div>
+        <div class="gl"><span>0</span><span id="g-wob-mx">20</span></div>
+      </div>
+      <div id="r-alert" class="al aok" style="display:none;margin-top:8px;"></div>
+    </div>
+    <div class="p">
+      <div class="pl">Wellbore Diagram</div>
+      <div style="display:flex;justify-content:center;padding:6px 0;">
+        <svg id="wbsvg" width="190" height="250" viewBox="0 0 190 250">
+          <defs><marker id="ab" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L6,3 L0,6Z" fill="#38bdf8"/></marker></defs>
+          <rect x="56" y="8" width="17" height="220" rx="2" fill="#1e2e40" stroke="#38bdf8" stroke-width="1"/>
+          <rect x="117" y="8" width="17" height="220" rx="2" fill="#1e2e40" stroke="#38bdf8" stroke-width="1"/>
+          <rect x="73" y="8" width="44" height="220" fill="rgba(56,189,248,.04)"/>
+          <text x="95" y="19" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#38bdf8" id="d-cas">7" CASING</text>
+          <rect id="d-mb" x="80" y="55" width="30" height="68" rx="3" fill="#1e2e40" stroke="#f59e0b" stroke-width="1.5"/>
+          <rect id="d-mf" x="78" y="121" width="34" height="7" rx="1" fill="#f59e0b" opacity=".9"/>
+          <text x="95" y="82" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#f59e0b" id="d-mt">MILL</text>
+          <text x="95" y="93" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#64748b" id="d-mo">6"OD</text>
+          <rect x="88" y="8" width="14" height="49" fill="#1e2e40" stroke="#64748b" stroke-width=".5"/>
+          <rect id="d-tgt" x="73" y="150" width="44" height="26" rx="1" fill="rgba(239,68,68,.1)" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+          <text x="95" y="166" text-anchor="middle" font-family="Share Tech Mono" font-size="6" fill="#ef4444" id="d-tl">FISH</text>
+          <line x1="73" y1="133" x2="80" y2="133" stroke="#22c55e" stroke-width=".5" stroke-dasharray="2,2"/>
+          <line x1="110" y1="133" x2="117" y2="133" stroke="#22c55e" stroke-width=".5" stroke-dasharray="2,2"/>
+          <text x="50" y="136" text-anchor="end" font-family="Share Tech Mono" font-size="7" fill="#22c55e" id="d-clr">CLR</text>
+          <line x1="95" y1="188" x2="95" y2="210" stroke="#38bdf8" stroke-width=".5" stroke-dasharray="2,2" marker-end="url(#ab)"/>
+          <text x="95" y="228" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#38bdf8">RETURNS</text>
+        </svg>
+      </div>
+      <div class="chs" id="d-chips" style="justify-content:center;"></div>
+    </div>
+  </div>
+
+  <div class="g4">
+    <div class="p pg">
+      <div class="pl">Torque & Power</div>
+      <div class="rb">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Est. Torque</div>
+        <div class="rv g" style="font-size:20px" id="r-torq">—</div>
+        <div class="rs" id="r-tpct"></div>
+      </div>
+      <div style="margin-top:8px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Power Req.</div>
+        <div style="font-family:var(--mono);font-size:16px;color:var(--a2)" id="r-pwr">— HP</div>
+      </div>
+    </div>
+    <div class="p">
+      <div class="pl">Flow — Dual Display</div>
+      <div class="rb">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Your Rate</div>
+        <div style="font-family:var(--mono);font-size:16px;color:var(--gr)" id="r-flow-gpm">— GPM</div>
+        <div style="font-family:var(--mono);font-size:14px;color:var(--a2)" id="r-flow-bpm">— BPM</div>
+      </div>
+      <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Annular Velocity</div>
+      <div style="font-family:var(--mono);font-size:14px;" id="r-av">— ft/min</div>
+    </div>
+    <div class="p">
+      <div class="pl">Rate & Clearance</div>
+      <div class="rb">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Mill Rate</div>
+        <div style="font-family:var(--mono);font-size:16px;color:var(--wn)" id="r-rate">—</div>
+      </div>
+      <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Clearance</div>
+      <div style="font-family:var(--mono);font-size:14px;color:var(--gr)" id="r-clr">—</div>
+    </div>
+    <div class="p pp">
+      <div class="pl">Survey & DLS</div>
+      <div class="rb">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Inclination</div>
+        <div class="rv p" style="font-size:20px" id="r-inc">—<span class="ru">°</span></div>
+      </div>
+      <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">DLS</div>
+      <div style="font-family:var(--mono);font-size:14px;color:var(--pu)" id="r-dls">—</div>
+      <div class="rs" id="r-dlsc"></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="p"><div class="pl">Full Summary</div>
+      <table class="tb"><thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+      <tbody id="sum-body"></tbody></table>
+    </div>
+    <div class="p pr"><div class="pl">Cautions</div>
+      <div id="caut-div"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 5 — MILL GUIDE -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t5" class="tc">
+  <div class="g2">
+    <div>
+      <div class="al ai" style="margin-bottom:10px;font-size:10px;">Select fish type in Setup tab to update rankings. Based on Baker Oil Tools, NOV, Weatherford, SPE literature + MBA field experience.</div>
+      <div class="al ae" style="margin-bottom:10px;font-size:11px;line-height:1.6;">
+        ⚠ WHY FLAT BOTTOM MILLS BURN FAST — Center inserts have near-zero surface footage (SF = π × 0 × RPM ≈ 0 ft/min at center). They rub and generate heat without cutting. All cutting load concentrates on one flat face with no relief geometry. In deviated wells, asymmetric side loading accelerates outer gauge wear unevenly. Result: mill goes bald well before the job is done, requiring early POOH to redress. Prefer Muncher, Watermelon, or Taper mills for any extended milling run — reserve FBM for short jobs only.
+      </div>
+      <div id="mill-matrix"></div>
+    </div>
+    <div>
+      <div class="p" style="margin-bottom:12px;">
+        <div class="pl">Mill Type Insert Life Comparison</div>
+        <table class="tb">
+          <thead><tr><th>Mill Type</th><th>Insert Life</th><th>Why</th><th>Best Use Case</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--gr)">Two-Pod Muncher</td><td style="color:var(--gr)">★★★★★ Longest</td><td>Blade shear — distributed load, no center dead zone</td><td>Any hard/long milling job</td></tr>
+            <tr><td style="color:var(--gr)">Watermelon Mill</td><td style="color:var(--gr)">★★★★☆ Very Good</td><td>Tapered OD spreads wear across gauge + shoulder</td><td>Extended tubular milling, window dressing</td></tr>
+            <tr><td style="color:var(--a2)">Taper Mill</td><td style="color:var(--a2)">★★★☆☆ Good</td><td>Angled face distributes load better than flat</td><td>Fish top dressing, opening up for overshot</td></tr>
+            <tr><td style="color:var(--a2)">Packer Mill</td><td style="color:var(--a2)">★★★★☆ Good</td><td>Geometry matches packer stages — right tool for job</td><td>Packers only</td></tr>
+            <tr><td style="color:var(--wn)">Junk Mill</td><td style="color:var(--wn)">★★★☆☆ Moderate</td><td>Intermittent contact — inserts rest between contacts</td><td>Debris cleanup only</td></tr>
+            <tr><td style="color:var(--rd)">Flat Bottom Mill</td><td style="color:var(--rd)">★★☆☆☆ Short</td><td>Center dead zone + flat face = concentrated heat + wear</td><td>Short jobs only — &lt;2 ft milling</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p" style="margin-bottom:12px;">
+        <div class="pl">Material Milling Properties</div>
+        <table class="tb">
+          <thead><tr><th>Material</th><th>Hardness</th><th>RPM Adj.</th><th>WOB Adj.</th><th>Best Insert</th></tr></thead>
+          <tbody>
+            <tr><td>Mild Steel (MS)</td><td>Low</td><td>+10%</td><td>-10%</td><td>TCR / Milled Tooth</td></tr>
+            <tr><td>Carbon Steel N80</td><td>Medium</td><td>Base</td><td>Base</td><td>TCR</td></tr>
+            <tr><td>P110 / Q125</td><td>High</td><td>-15%</td><td>+15%</td><td>TCS / PDC</td></tr>
+            <tr><td>SS 316 / 304</td><td>High + Work Harden</td><td>-25%</td><td>+10%</td><td>PDC / Diamond</td></tr>
+            <tr><td>13 Chrome (13Cr)</td><td>Med-High</td><td>-20%</td><td>+12%</td><td>TCS / PDC</td></tr>
+            <tr><td>Inconel 625/718</td><td>Very High</td><td>-35%</td><td>+20%</td><td>PDC Diamond</td></tr>
+            <tr><td>Cast Iron</td><td>Brittle</td><td>+5%</td><td>-15%</td><td>TCR</td></tr>
+            <tr><td>Composite / FRP</td><td>Very Low</td><td>+20%</td><td>-30%</td><td>Milled Tooth</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p">
+        <div class="pl">Cuttings Appearance Guide</div>
+        <table class="tb">
+          <thead><tr><th>Appearance</th><th>Diagnosis</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>Hair-like, fine</td><td>WOB too low</td><td style="color:var(--wn)">Increase WOB</td></tr>
+            <tr><td>1/32"×3" strips ✓</td><td>Ideal milling</td><td style="color:var(--gr)">Maintain</td></tr>
+            <tr><td>Fish-scale flakes</td><td>RPM too high</td><td style="color:var(--wn)">Reduce RPM, add WOB</td></tr>
+            <tr><td>Coarse chunks</td><td>WOB too high</td><td style="color:var(--wn)">Reduce WOB</td></tr>
+            <tr><td>No returns</td><td>Packoff / circ loss</td><td style="color:var(--rd)">STOP — circulate</td></tr>
+            <tr><td>Blue/black cuttings</td><td>Overheating</td><td style="color:var(--rd)">Reduce RPM + WOB</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 6 — BHA DESIGNER -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t6" class="tc">
+  <div class="g2">
+    <div>
+      <div class="al ap" style="margin-bottom:10px;font-size:11px;">
+        Design your own BHA below (from surface → bit). Fill tool name, OD, and length. The system will classify your assembly and give recommendations.
+      </div>
+
+      <!-- BHA TYPE RECOMMENDATION -->
+      <div class="p pa" style="margin-bottom:10px;">
+        <div class="pl">Auto BHA Recommendation</div>
+        <div id="auto-bha-rec"></div>
+        <div id="auto-bha-list" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- CUSTOM BHA SLOTS -->
+      <div class="p" style="margin-bottom:10px;">
+        <div class="pl">Your Custom BHA Design</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:11px;color:var(--mt);font-family:var(--mono);">Add components from surface down</span>
+          <button class="btn-add" onclick="addBHASlot()">+ ADD COMPONENT</button>
+        </div>
+        <div id="bha-slots"></div>
+        <button class="btn" style="margin-top:8px;" onclick="analyzeBHA()">▶ ANALYZE MY BHA</button>
+      </div>
+    </div>
+
+    <div>
+      <!-- BHA ANALYSIS RESULTS -->
+      <div class="p pp" style="margin-bottom:10px;">
+        <div class="pl">BHA Analysis & Classification</div>
+        <div id="bha-analysis">
+          <div class="al ai" style="font-size:11px;">Add components and click Analyze to get classification and recommendation.</div>
+        </div>
+      </div>
+
+      <!-- STABILIZER GUIDE -->
+      <div class="p">
+        <div class="pl">Stabilizer Sizing Reference</div>
+        <table class="tb">
+          <thead><tr><th>Casing</th><th>Full Gauge OD</th><th>Undergauge OD</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>4½"</td><td>3.90"</td><td>3.75"</td><td>Slim BHA</td></tr>
+            <tr><td>5½"</td><td>4.63"</td><td>4.50"</td><td>Standard</td></tr>
+            <tr><td>7"</td><td>6.13"</td><td>5.90"</td><td>HD Milling</td></tr>
+            <tr><td>9⅝"</td><td>8.63"</td><td>8.40"</td><td>Large bore</td></tr>
+            <tr><td>13⅜"</td><td>12.25"</td><td>12.00"</td><td>Conductor</td></tr>
+          </tbody>
+        </table>
+        <div class="al ai" style="margin-top:8px;font-size:10px;">
+          Pendulum: no stabilizer near bit — allows pendulum effect, reduces inclination.<br>
+          Stiff: stabilizer near bit + mid-BHA — maintains inclination, resists doglegs.<br>
+          Packed: stabilizers at bit, mid, and top — maximum stiffness, for straight vertical.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 7 — HELP & FORMULAS -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="t7" class="tc">
+  <div class="al ai" style="margin-bottom:16px;font-size:11px;">
+    All formulas used in this tool. References: SPE-179070, API RP 13D, Baker Oil Tools Milling Handbook, PetroWiki, Drilling Engineering (Rabia).
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">1. RPM Calculation</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Surface Footage Method</div>
+      <div class="help-formula-eq">Max RPM = (SF_target × 12) ÷ (π × Mill_OD_inches)</div>
+      <div class="help-formula-desc">Surface footage (SF) target for HD milling is 60–100 ft/min. We use 80 ft/min as baseline for standard casing milling. Higher SF = more heat, faster insert wear.</div>
+      <div class="help-formula-vars">SF_target = 80 ft/min (baseline) | Mill_OD = outer diameter in inches | π = 3.14159<br>Adjusted by: Material factor · Deviation correction (1 − Inc° × 0.003) · Hardness factor</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Deviation RPM Correction</div>
+      <div class="help-formula-eq">RPM_corrected = RPM_base × (1 − Inclination° × 0.003)</div>
+      <div class="help-formula-desc">Lateral forces in deviated wells cause vibration. RPM is reduced to minimize lateral vibration damage to mill inserts and casing wall.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">2. Weight on Bit (WOB)</div>
+    <div class="help-formula">
+      <div class="help-formula-name">WOB Rule of Thumb</div>
+      <div class="help-formula-eq">Max WOB (klbs) = Mill_OD (in) × 2.8 × MillType_factor ÷ (Hardness × Grade_factor)</div>
+      <div class="help-formula-desc">Industry rule: 1.5 to 3 klbs per inch of mill OD. We use 2.8 as baseline for heavy duty flat bottom milling. Adjusted for mill type, hardness of target material, and pipe grade.</div>
+      <div class="help-formula-vars">MillType_factor: Flat=1.0 · Section=1.15 · Junk=1.1 · Taper=0.85<br>Hardness: MS=0.85 · N80=1.0 · P110=1.25 · SS=1.4 · Inconel=1.7</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">WOB Deviation Correction (Friction Factor)</div>
+      <div class="help-formula-eq">WOB_effective = WOB_surface × (1 − Inclination° ÷ 90 × 0.4)</div>
+      <div class="help-formula-desc">In deviated wells, friction between drillstring and casing absorbs applied WOB. At 90° (horizontal), effective WOB is only ~60% of surface weight applied.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">3. Milling Torque</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Estimated Downhole Torque</div>
+      <div class="help-formula-eq">Torque (ft-lbs) = (WOB × 1000 × Mill_OD) ÷ (2 × 12) × MillType_factor</div>
+      <div class="help-formula-desc">Simplified torque model. Actual torque depends on insert condition, cutting depth, and fluid lubricity. Use this as a planning estimate — always monitor actual surface torque.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">4. Flow Rate & Annular Velocity</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Annular Velocity</div>
+      <div class="help-formula-eq">AV (ft/min) = Flow_rate (gpm) ÷ (7.48 × Ann_Area_ft²)</div>
+      <div class="help-formula-eq">Ann_Area (ft²) = π ÷ 4 × (CasingID² − MillOD²) ÷ 144</div>
+      <div class="help-formula-vars">CasingID and MillOD in inches | 7.48 = gallons per cubic foot | 144 = in² per ft²</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">GPM ↔ BPM Conversion</div>
+      <div class="help-formula-eq">BPM = GPM ÷ 42</div>
+      <div class="help-formula-eq">GPM = BPM × 42</div>
+      <div class="help-formula-desc">1 barrel = 42 US gallons. BPM (barrels per minute) is commonly used on rigs. GPM is used for smaller workover/CT operations.</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Minimum AV by Deviation (SPE-179070)</div>
+      <div class="help-formula-eq">Min AV = 50 ft/min (0°–30°) · 80 (30°–45°) · 100 (45°–60°) · 120 (60°–75°) · 150 (75°–90°)</div>
+      <div class="help-formula-desc">Deviated wells require higher annular velocity to prevent cuttings beds forming on the low side of the wellbore. Near-horizontal wells need 3× the vertical minimum.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">5. Viscosity Conversion (Field Method)</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Marsh Funnel → Estimated PV</div>
+      <div class="help-formula-eq">Est. PV (cP) ≈ (Marsh_seconds − 26) × 0.8</div>
+      <div class="help-formula-desc">Marsh funnel water = 26 sec/qt. Each second above water baseline approximates ~0.8 cP increase in plastic viscosity. This is a field approximation — not a substitute for Fann readings.</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Marsh Funnel → Estimated YP</div>
+      <div class="help-formula-eq">Est. YP ≈ (Marsh_seconds − 26) × 0.5</div>
+      <div class="help-formula-desc">Yield point estimation from Marsh funnel. Valid for WBM — OBM and SBM require Fann readings for accurate YP.</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Temperature Correction</div>
+      <div class="help-formula-eq">PV_corrected = PV_measured × (1 + (T − 120°F) × 0.003)</div>
+      <div class="help-formula-desc">Viscosity decreases with temperature. Mud measured at 85°F will be thinner downhole. Correct upward for cold surface measurements.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">6. Dogleg Severity (DLS)</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Minimum Curvature Method (Industry Standard)</div>
+      <div class="help-formula-eq">DL = arccos[cos(I2−I1) − sin(I1)×sin(I2)×(1−cos(A2−A1))]</div>
+      <div class="help-formula-eq">DLS (°/100ft) = DL (degrees) × 100 ÷ ΔMD (ft)</div>
+      <div class="help-formula-vars">I1,I2 = inclination at upper and lower survey (degrees)<br>A1,A2 = azimuth at upper and lower survey (degrees)<br>ΔMD = measured depth interval between surveys (ft)</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">DLS Severity Classification</div>
+      <div class="help-formula-eq">LOW: &lt;1°/100ft | MODERATE: 1–3° | HIGH: 3–6° | SEVERE: &gt;6°</div>
+      <div class="help-formula-desc">For milling operations, DLS &gt;3°/100ft requires undergauge stabilizers and flex subs. DLS &gt;6°/100ft is critical — use PDM motor and minimize rotary RPM.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">7. BHA Classification</div>
+    <div class="help-formula">
+      <div class="help-formula-name">Pendulum Assembly</div>
+      <div class="help-formula-eq">No stabilizer within 30 ft of bit. Allows bit to swing toward vertical.</div>
+      <div class="help-formula-desc">Used in: Deviated wells to drop inclination. Works by gravity — bit hangs below the pendulum point. Suitable for inclinations &lt;30°. Not suitable for high DLS sections.</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Stiff (Stabilized) Assembly</div>
+      <div class="help-formula-eq">Stabilizer within 5–10 ft of bit + mid-BHA stabilizer.</div>
+      <div class="help-formula-desc">Used in: Hold sections, moderate DLS wells. Maintains current inclination. Resists doglegs. Standard choice for most milling operations 30°–60°.</div>
+    </div>
+    <div class="help-formula">
+      <div class="help-formula-name">Packed (Full Gauge) Assembly</div>
+      <div class="help-formula-eq">3 full-gauge stabilizers: near bit + 1 DC above + top DC.</div>
+      <div class="help-formula-desc">Used in: Vertical wells, P&A operations, where straight hole is critical. Maximum stiffness. Minimizes deviation in soft formations. Not suitable for high DLS wells.</div>
+    </div>
+  </div>
+
+  <div class="help-section">
+    <div class="help-title">8. Unit Conversions Reference</div>
+    <div class="help-formula">
+      <div class="help-formula-name">All Key Conversions</div>
+      <div class="help-formula-eq">1 BPM = 42 GPM = 158.99 L/min</div>
+      <div class="help-formula-eq">1 ppg = 119.83 kg/m³</div>
+      <div class="help-formula-eq">1 ft-lb = 1.35582 N·m</div>
+      <div class="help-formula-eq">1 klbs = 4.44822 kN</div>
+      <div class="help-formula-eq">1 ft = 0.3048 m | 1 inch = 25.4 mm</div>
+      <div class="help-formula-eq">1 ft/min = 0.00508 m/s</div>
+    </div>
+  </div>
+
+  <div class="p" style="margin-top:16px;">
+    <div class="pl">Quick Reference Card</div>
+    <div class="g3">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px;">TYPICAL MILLING PARAMS</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--mt);line-height:1.8;">
+          RPM: 40–120 typical<br>
+          WOB: 3–25 klbs<br>
+          Flow: 2–8 gpm (WO)<br>
+          AV: &gt;50 ft/min<br>
+          Torque: &lt;80% limit
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px;">MATERIAL HARDNESS</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--mt);line-height:1.8;">
+          Composite: 1 (easiest)<br>
+          MS / J55: 2<br>
+          N80 / L80: 3<br>
+          P110 / Q125: 4<br>
+          13Cr: 4.5<br>
+          SS 316: 5<br>
+          Inconel: 6 (hardest)
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-bottom:6px;">FLOW CONVERSIONS</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--mt);line-height:1.8;">
+          1 GPM = 0.0238 BPM<br>
+          2 GPM = 0.048 BPM<br>
+          3 GPM = 0.071 BPM<br>
+          5 GPM = 0.119 BPM<br>
+          8 GPM = 0.190 BPM<br>
+          10 GPM = 0.238 BPM
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- FOOTER -->
+<div style="text-align:center;padding:28px 16px 40px;border-top:1px solid #1a2d40;margin-top:40px;">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:.05em;color:#f59e0b;margin-bottom:6px;">MILL<span style="color:#fff;">R</span></div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#64748b;letter-spacing:.1em;">
+    © 2025 BALA &nbsp;·&nbsp; Petroleum Engineer · Wells Engineering &nbsp;·&nbsp; All Rights Reserved
+  </div>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:#374151;margin-top:5px;letter-spacing:.07em;">
+    Designed & built from field experience · MBA Field · Rajasthan Asset
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+const CID={
+  '4.5':{'9.5':4.090,'11.6':3.920,'13.5':3.826,'15.1':3.796},
+  '5':{'11.5':4.408,'13':4.276,'15':4.126,'18':4.000},
+  '5.5':{'14':4.778,'17':4.670,'20':4.548,'23':4.430},
+  '7':{'17':6.538,'20':6.456,'23':6.366,'26':6.276,'29':6.184,'32':6.094},
+  '9.625':{'36':8.921,'40':8.835,'43.5':8.755,'47':8.681,'53.5':8.535},
+  '13.375':{'48':12.715,'54.5':12.615,'61':12.515,'68':12.415}
+};
+const CWT={
+  '4.5':['9.5','11.6','13.5','15.1'],'5':['11.5','13','15','18'],
+  '5.5':['14','17','20','23'],'7':['17','20','23','26','29','32'],
+  '9.625':['36','40','43.5','47','53.5'],'13.375':['48','54.5','61','68']
+};
+const MTF={
+  flat_bottom:{rF:1.0,wF:1.0,rtF:1.0,n:'Flat Bottom Mill'},
+  taper:{rF:1.1,wF:.85,rtF:1.2,n:'Taper Mill'},
+  watermelon:{rF:1.2,wF:.8,rtF:.9,n:'Watermelon Mill'},
+  junk:{rF:.9,wF:1.1,rtF:.7,n:'Junk Mill'},
+  section:{rF:.85,wF:1.15,rtF:.6,n:'Section Mill'},
+  packer:{rF:.9,wF:1.0,rtF:.8,n:'Packer Mill'},
+  pilot:{rF:1.0,wF:.9,rtF:.9,n:'Pilot Mill'},
+  two_pod:{rF:1.05,wF:.9,rtF:1.4,n:'Two-Pod Mill (Muncher)'}
+};
+const TGT={
+  casing_tubular:{h:1.0,n:'Casing/Tubular'},casing_cemented:{h:1.6,n:'Cemented Tubular'},
+  packer_mech:{h:1.3,n:'Mech. Packer'},packer_hydr:{h:1.5,n:'Hydraulic Packer'},
+  pcp_stator:{h:.75,n:'PCP Stator (SS)'},pcp_rotor:{h:1.45,n:'PCP Rotor (Chrome)'},esp_motor:{h:1.1,n:'ESP Motor'},
+  junk_metal:{h:1.4,n:'Junk/Metal'},bridge_plug:{h:1.2,n:'Bridge Plug'},
+  whipstock:{h:1.35,n:'Whipstock'},drillstring:{h:1.25,n:'Stuck Drillstring'}
+};
+// Material factors: {h=hardness multiplier, rAdj=RPM%, wAdj=WOB%, hint, insert}
+const MAT={
+  MS:     {h:.85,rAdj:+10,wAdj:-10,hint:'Mild Steel — easy to mill, low RPM/WOB needed',insert:'TCR / Milled Tooth'},
+  CS:     {h:1.0,rAdj:0,wAdj:0,hint:'Carbon Steel N80/L80 — standard baseline milling parameters',insert:'TCR'},
+  HS:     {h:1.25,rAdj:-15,wAdj:+15,hint:'High strength P110/Q125 — harder, reduce RPM, increase WOB',insert:'TCS / PDC'},
+  SS:     {h:1.4,rAdj:-25,wAdj:+10,hint:'Stainless Steel — work-hardens if RPM too high. Keep RPM low!',insert:'PDC / Diamond'},
+  '13Cr': {h:1.2,rAdj:-20,wAdj:+12,hint:'13 Chrome — corrosion resistant, moderate-high hardness',insert:'TCS / PDC'},
+  Inconel:{h:1.7,rAdj:-35,wAdj:+20,hint:'Inconel 625/718 — very hard nickel alloy. PDC inserts mandatory. Low RPM.',insert:'PDC Diamond — mandatory'},
+  CastIron:{h:.8,rAdj:+5,wAdj:-15,hint:'Cast iron — brittle, low WOB to avoid sudden fracture and large chunks',insert:'TCR'},
+  Composite:{h:.4,rAdj:+20,wAdj:-30,hint:'Composite/FRP — very soft, minimal WOB. High flow for cuttings.',insert:'Milled Tooth'},
+  Rubber:{h:.3,rAdj:+15,wAdj:-40,hint:'Rubber/Elastomer — mill at low WOB. Rubber wraps around inserts if over-loaded.',insert:'Milled Tooth / TCR'}
+};
+const MATF={tcr:{rB:1.0,wB:1.0},tcs:{rB:.95,wB:1.05},diamond:{rB:1.15,wB:.85},milled_tooth:{rB:.85,wB:1.1},muncher:{rB:1.05,wB:.9}};
+const GF={J55:.85,K55:.9,N80:1.0,L80:1.05,P110:1.25,Q125:1.4};
+const MILLS={
+  casing_tubular:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ FIELD PREFERRED — Blade geometry distributes cutting load across the full OD, not just the bottom face. Inserts last significantly longer than FBM on long tubular jobs. Produces uniform fine cuttings. Lower torque demand. Run as first choice whenever available.'},
+    {n:'Watermelon Mill',r:5,c:'best',d:'Excellent insert life — tapered OD spreads wear evenly across gauge and shoulder. Better than FBM for extended milling runs. Naturally self-centralizing. Good choice when Muncher not on stock.'},
+    {n:'Flat Bottom Mill',r:3,c:'good',d:'⚠ BURNS FAST — Center inserts have near-zero surface footage and wear by friction not cutting. Outer gauge inserts also wear unevenly in deviated wells. Use for short jobs or when above mills unavailable. Expect more POOH trips to redress.'},
+    {n:'Taper Mill',r:3,c:'good',d:'Good for dressing fish tops and opening up the fish for overshot/washover entry. Not for extended milling runs.'},
+    {n:'Section Mill',r:4,c:'good',d:'When full casing section removal is required for P&A or sidetrack window.'}
+  ],
+  casing_cemented:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ BEST for cemented pipe — eliminates coring risk completely. Blade shear action works well on cement + steel combination. Longer insert life than FBM on abrasive cement cuttings.'},
+    {n:'Section Mill',r:5,c:'best',d:'Preferred for long cemented sections in P&A — designed specifically to cut and collapse casing over extended intervals.'},
+    {n:'Watermelon Mill',r:4,c:'good',d:'Good insert durability on cement. Tapered gauge maintains centralization in eccentric cemented pipe.'},
+    {n:'Flat Bottom Mill + PDC',r:3,c:'good',d:'PDC inserts handle cement better than TCR, but still burns faster than Muncher on long cemented runs. Use PDC only — standard TCR glazes on cement.'},
+    {n:'Flat Bottom Mill (TCR)',r:1,c:'poor',d:'⚠ NOT RECOMMENDED for cemented pipe — TCR inserts wear rapidly on abrasive cement, and coring risk on eccentric pipe. Short insert life means frequent POOH trips.'}
+  ],
+  packer_mech:[
+    {n:'Packer Mill',r:5,c:'best',d:'⭐ DEDICATED TOOL — Designed to stage through slips (hard), mandrel (medium), and elastomer elements (soft) sequentially. Geometry matches packer component sequence. Longer overall life than FBM because cutting face geometry is optimized for each stage.'},
+    {n:'Two-Pod Mill (Muncher)',r:4,c:'good',d:'Good alternative — lower torque on hard slip components. Better insert durability than FBM on steel slips.'},
+    {n:'Junk Mill',r:4,c:'good',d:'Excellent for cleanup run after main packer body milled — grabs and grinds loose slip fragments and metallic debris.'},
+    {n:'Flat Bottom Mill',r:2,c:'poor',d:'⚠ BURNS ON SLIPS — Hard steel slips concentrate load on center inserts causing rapid burn. If used, start at 20% max WOB on slips and monitor torque closely. Expect short run life.'},
+    {n:'Section Mill',r:1,c:'poor',d:'Not designed for packer milling.'}
+  ],
+  packer_hydr:[
+    {n:'Packer Mill',r:5,c:'best',d:'⭐ MANDATORY for permanent hydraulic packers — hard metallurgy slips and mandrel require the staged geometry of a dedicated packer mill. Sequential stage milling is the only reliable approach.'},
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'Strong second choice — blade geometry handles hard permanent packer metallurgy better than FBM. Lower torque spikes when transitioning between packer components.'},
+    {n:'Watermelon Mill',r:3,c:'good',d:'Acceptable on softer packer elements after slip stage is cleared with packer mill or Muncher.'},
+    {n:'Flat Bottom Mill',r:2,c:'poor',d:'⚠ HIGH RISK — Permanent packer slips are extremely hard. FBM center inserts will burn within minutes of tagging hard slips. Sudden torque spikes common. Only use as last resort with max 15% WOB.'},
+    {n:'Section Mill',r:1,c:'poor',d:'Not appropriate for packer milling.'}
+  ],
+  pcp_stator:[
+    {n:'Watermelon Mill',r:5,c:'best',d:'⭐ FIELD PREFERRED for SS stator — tapered gauge distributes cutting load on the SS tube wall rather than concentrating on flat bottom face. Better insert life than FBM on stainless. Rubber/elastomer elements mill easily regardless of mill type.'},
+    {n:'Two-Pod Mill (Muncher)',r:4,c:'good',d:'Good insert durability. Blade geometry handles SS work-hardening tendency better than TCR inserts.'},
+    {n:'Flat Bottom Mill',r:3,c:'good',d:'Works but burns faster on SS stator tube. Center inserts suffer on stainless. Use if above options unavailable — keep RPM lower end to prevent SS work-hardening.'},
+    {n:'Junk Mill',r:4,c:'good',d:'Good cleanup tool for stator housing fragments and rubber debris after primary milling.'},
+    {n:'Section Mill',r:1,c:'poor',d:'N/A for stator milling.'}
+  ],
+  pcp_rotor:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ MBA FIELD PROVEN — Chrome rotor (HRC 60+) burns standard FBM inserts within minutes. Muncher blade shear geometry is the only reliable option for hard chrome. Produces finer cuttings, lower torque spikes, significantly longer run life. First choice always.'},
+    {n:'Flat Bottom Mill + PDC',r:3,c:'good',d:'PDC/Diamond insert only — standard TCR glazes immediately on chrome. Expect much lower ROP than Muncher. Monitor torque for glazing (flat torque trend with no progress = glazed face, POOH immediately).'},
+    {n:'Watermelon Mill + PDC',r:3,c:'good',d:'PDC inserts with watermelon geometry — better insert life than FBM-PDC on chrome due to distributed load. Worth trying if Muncher unavailable.'},
+    {n:'Flat Bottom Mill (TCR)',r:1,c:'poor',d:'⚠ NOT RECOMMENDED — Hard chrome work-hardens under TCR inserts. Burns within 1–2 ft. High risk of stalling and stuck mill. Use only if absolutely no alternative — start at 10% max WOB.'},
+    {n:'Junk Mill',r:3,c:'good',d:'Cleanup of chrome fragments and debris after primary rotor milling.'}
+  ],
+  esp_motor:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ PREFERRED — ESP motor housing and shaft internals are mixed hardness materials. Muncher handles the metallurgy variation better than FBM. Better insert life on the harder motor shaft components.'},
+    {n:'Watermelon Mill',r:4,c:'good',d:'Good insert life on ESP motor housing — tapered gauge handles the mixed hard/soft material transitions in motor components.'},
+    {n:'Flat Bottom Mill',r:3,c:'good',d:'Acceptable for ESP housing (moderate hardness) but burns faster on harder shaft/rotor internals. Use TCR inserts minimum.'},
+    {n:'Junk Mill',r:3,c:'good',d:'For cable, protector debris, and fragmented motor parts in cleanup pass.'},
+    {n:'Section Mill',r:1,c:'poor',d:'N/A.'}
+  ],
+  junk_metal:[
+    {n:'Junk Mill (Bladed)',r:5,c:'best',d:'⭐ PURPOSE-BUILT — Bladed junk mill is specifically designed for irregular metallic debris. Captures and grinds bit cones, slips, hand tools, chunks. Does not burn fast because contact is intermittent not continuous.'},
+    {n:'Concave Junk Mill',r:5,c:'best',d:'Bowl-shaped face guides junk to center for grinding — excellent in deviated wells where debris rolls to low side. Best insert life of all options on junk because bowl geometry protects inserts.'},
+    {n:'Two-Pod Mill',r:3,c:'good',d:'For hard-banded tool joint fragments and dense metallic debris where standard junk mill struggles.'},
+    {n:'Flat Bottom Mill',r:2,c:'poor',d:'⚠ BURNS UNEVENLY on irregular junk — hard contact points cause localized insert burn while other areas idle. Junk mill is always preferred.'},
+    {n:'Section Mill',r:1,c:'poor',d:'N/A.'}
+  ],
+  bridge_plug:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ PREFERRED for composite bridge plugs — composite material and metal slip components need the shear blade approach. Better insert life than FBM on the abrasive composite material.'},
+    {n:'Watermelon Mill',r:4,c:'good',d:'Good choice for cast iron plugs — distributed gauge load handles the brittle fracture behavior of cast iron better than flat face. Less risk of large fragment generation.'},
+    {n:'Flat Bottom Mill',r:3,c:'good',d:'Acceptable for cast iron plugs (brittle, easy to mill) but avoid on composite plugs where abrasive material burns TCR inserts quickly.'},
+    {n:'Junk Mill',r:4,c:'good',d:'Cleanup run after main plug milled — essential to grind slip fragments before running next tool.'},
+    {n:'Section Mill',r:1,c:'poor',d:'N/A.'}
+  ],
+  whipstock:[
+    {n:'Watermelon Mill',r:5,c:'best',d:'⭐ ESSENTIAL for window trimming and dressing after whipstock set — self-centralizing tapered gauge maintains window geometry without damaging casing.'},
+    {n:'Flat Bottom + Starter Mill',r:5,c:'best',d:'Industry standard for initial window cut. Starter mill is specifically sized for whipstock face — not interchangeable with standard FBM.'},
+    {n:'Taper Mill',r:4,c:'good',d:'Good for cleaning up window edges and preparing for drill-out after window milled.'},
+    {n:'Section Mill',r:2,c:'poor',d:'Only for full casing exit operations, not standard whipstock window.'},
+    {n:'Junk Mill',r:1,c:'poor',d:'N/A.'}
+  ],
+  drillstring:[
+    {n:'Two-Pod Mill (Muncher)',r:5,c:'best',d:'⭐ FIELD PROVEN — Hard-banded tool joints (tungsten carbide OD protection) will burn a standard FBM in minutes. Muncher blade geometry specifically handles hard-banded DP. Better run life, more footage per POOH trip.'},
+    {n:'Watermelon Mill',r:4,c:'good',d:'Good for standard weight DP without hard banding — distributed load means longer insert life than FBM for extended drillstring milling jobs.'},
+    {n:'Section Mill',r:4,c:'good',d:'When full section removal is needed to allow washover or create a sidetrack window.'},
+    {n:'Flat Bottom Mill',r:2,c:'poor',d:'⚠ BURNS FAST on hard-banded DP — center inserts take the full load of tool joint hard facing. Short run life. Use only on non-hard-banded plain DP.'},
+    {n:'Pilot Mill',r:3,c:'good',d:'Re-entry guidance when fish top is inside a tubular and mill needs to track centrally.'}
+  ]
+};
+
+// ═══════════════════════ STATE ═══════════════════════
+let units='field', lastDLS=0, lastMinFlow=2, lastRPM=80, lastWOB=10, slotCount=0;
+
+// ═══════════════════════ UNIT TOGGLE ═══════════════════════
+function setU(u){
+  units=u;
+  document.getElementById('bf').classList.toggle('active',u==='field');
+  document.getElementById('bm').classList.toggle('active',u==='metric');
+  updLabels(); C();
+}
+function updLabels(){
+  const f=units==='field';
+  sl('lod',f?'Mill OD (inches)':'Mill OD (mm)');
+  sl('lcs',f?'Casing Size (inches)':'Casing OD (mm)');
+  sl('ldp',f?'Mill Depth (ft MD)':'Mill Depth (m MD)');
+  sl('lmt',f?'Max Surface Torque (ft-lbs)':'Max Torque (N·m)');
+  sl('lmw',f?'Mud Weight (ppg)':'Mud Weight (kg/m³)');
+  sl('lfr',f?'Circulation Rate (gpm)':'Circulation Rate (L/min)');
+  sl('lm1',f?'MD-1 (ft)':'MD-1 (m)'); sl('lm2',f?'MD-2 (ft)':'MD-2 (m)'); sl('lm3',f?'MD-3 (ft)':'MD-3 (m)');
+}
+function sl(id,t){const e=document.getElementById(id);if(e)e.textContent=t;}
+function D(v,t){
+  if(units==='field') return v;
+  const m={in:v*25.4,ft:v*0.3048,ppg:v*119.83,gpm:v*3.785,klbs:v*4.448,ftlbs:v*1.356,fph:v*0.3048,ftmin:v*0.3048};
+  return m[t]!==undefined?+m[t].toFixed(t==='in'?1:t==='ppg'?0:2):v;
+}
+function U(t){
+  const f={in:'in',ft:'ft',ppg:'ppg',gpm:'gpm',klbs:'klbs',ftlbs:'ft-lbs',fph:'ft/hr',ftmin:'ft/min'};
+  const m={in:'mm',ft:'m',ppg:'kg/m³',gpm:'L/min',klbs:'kN',ftlbs:'N·m',fph:'m/hr',ftmin:'m/min'};
+  return (units==='field'?f:m)[t]||t;
+}
+function GV(id){return parseFloat(document.getElementById(id).value)||0;}
+
+// ═══════════════════════ CASING ═══════════════════════
+function updCW(){
+  const sz=document.getElementById('casingSize').value;
+  const sel=document.getElementById('casingWt');
+  const wts=CWT[sz]||['26'];
+  sel.innerHTML=wts.map(w=>`<option value="${w}">${w} lb/ft</option>`).join('');
+  sel.value=wts[Math.floor(wts.length/2)];
+}
+function getCID(){
+  const sz=document.getElementById('casingSize').value;
+  const wt=GV('casingWt');
+  const d=CID[sz]||{};
+  const keys=Object.keys(d).map(Number).sort((a,b)=>a-b);
+  let closest=keys[0];
+  keys.forEach(k=>{if(Math.abs(k-wt)<Math.abs(closest-wt))closest=k;});
+  return d[closest.toString()]||(parseFloat(sz)-0.5);
+}
+
+// ═══════════════════════ DLS ═══════════════════════
+function calcDLS(){
+  const R=d=>d*Math.PI/180;
+  function dls(m1,i1,a1,m2,i2,a2){
+    const dm=m2-m1; if(dm<=0) return 0;
+    const cl=Math.cos(R(i1))*Math.cos(R(i2))+Math.sin(R(i1))*Math.sin(R(i2))*Math.cos(R(a2-a1));
+    return +(Math.acos(Math.min(1,Math.max(-1,cl)))*(180/Math.PI)*(100/dm)).toFixed(2);
+  }
+  const d12=dls(GV('md1'),GV('inc1'),GV('az1'),GV('md2'),GV('inc2'),GV('az2'));
+  const d23=dls(GV('md2'),GV('inc2'),GV('az2'),GV('md3'),GV('inc3'),GV('az3'));
+  const avg=+((d12+d23)/2).toFixed(2);
+  document.getElementById('dls12').textContent=d12+'°/100ft';
+  document.getElementById('dls23').textContent=d23+'°/100ft';
+  document.getElementById('dlsavg').textContent=avg+'°/100ft';
+  lastDLS=avg;
+
+  // DLS assess
+  const ae=document.getElementById('dls-assess');
+  let msg='',cls='ai';
+  if(avg<1){msg='✓ Low DLS — Standard BHA. Full-gauge stabilizer OK.';cls='aok';}
+  else if(avg<3){msg='⚡ Moderate DLS — Undergauge stabilizers. Consider flex sub.';cls='aw';}
+  else if(avg<6){msg='⚠ High DLS — Short BHA mandatory. Flex joint + undergauge stabs only.';cls='aw';}
+  else{msg='🚨 SEVERE DLS (>6°/100ft) — PDM motor required. 30% WOB max. Risk of BHA fatigue.';cls='ae';}
+  ae.className='al '+cls; ae.textContent=msg; ae.style.display='block';
+
+  // DLS BHA rec
+  let bn='';
+  if(avg<1) bn=`<div class="al aok" style="font-size:11px;">Packed or Stiff assembly. Full-gauge stabilizer 1–2 DCs above mill. Standard drill collars for WOB.</div>`;
+  else if(avg<3) bn=`<div class="al aw" style="font-size:11px;">Stiff assembly with undergauge stabs (−0.25" from full gauge). Short flex sub above mill body recommended.</div>`;
+  else if(avg<6) bn=`<div class="al aw" style="font-size:11px;">Short stiff BHA. Single undergauge stab only. Articulated flex joint mandatory. PDM motor preferred.</div>`;
+  else bn=`<div class="al ae" style="font-size:11px;">Slim articulated BHA only. PDM with &lt;1.5° bent sub. No stabilizer inside casing. CT deployment preferred.</div>`;
+  document.getElementById('dls-bha-rec').innerHTML=bn;
+
+  // Dev table
+  const inc=GV('millingInc');
+  const wobCorr=(1-inc/90*0.4)*100;
+  const rpmCorr=(1-inc*0.003)*100;
+  const avReq=inc<30?50:inc<45?80:inc<60?100:inc<75?120:150;
+  document.getElementById('dev-tbody').innerHTML=`
+    <tr><td>WOB Efficiency</td><td>100%</td><td>${wobCorr.toFixed(0)}%</td><td>${inc>45?'Use auto-driller':'Monitor hookload'}</td></tr>
+    <tr><td>RPM Correction</td><td>100%</td><td>${rpmCorr.toFixed(0)}%</td><td>${inc>60?'Reduce surface RPM':'Normal'}</td></tr>
+    <tr><td>Min AV (ft/min)</td><td>50</td><td>${avReq}</td><td>${inc>45?'Increase pump rate':'Standard'}</td></tr>
+    <tr><td>Cuttings Bed Risk</td><td>None</td><td>${inc<30?'Low':inc<60?'Medium':'HIGH'}</td><td>${inc>45?'Short trips every 15 min':'Normal circ'}</td></tr>
+    <tr><td>BHA Type</td><td>Packed/Stiff</td><td>${inc<20?'Packed/Stiff':inc<45?'Stiff':inc<75?'Stiff+Flex':'Pendulum/Motor'}</td><td>See BHA tab</td></tr>`;
+  C();
+}
+
+// ═══════════════════════ VISCOSITY ═══════════════════════
+function calcVis(){
+  const msh=GV('marshSec'), fld=GV('fieldSec'), tmp=GV('tempF');
+  // Field conversion
+  const estPV=+((msh-26)*0.8*(1+(tmp-120)*0.003)).toFixed(1);
+  const estYP=+((msh-26)*0.5).toFixed(1);
+  document.getElementById('vis-conv-pv').textContent=Math.max(0,estPV);
+  document.getElementById('vis-conv-yp').textContent=Math.max(0,estYP);
+
+  // Use lab values if provided, else field estimate
+  const pv=GV('pvVal')||Math.max(1,estPV);
+  const yp=GV('ypVal')||Math.max(0,estYP);
+  const g10s=GV('gel10s')||8, g10m=GV('gel10m')||16;
+
+  let fn='';
+  if(msh<35) fn='⚠ Marsh funnel too low for milling — cuttings suspension will be poor. Treat to increase viscosity.';
+  else if(msh>70) fn='⚠ Marsh funnel too high — ECD concerns. High pump pressure may limit flow rate.';
+  else fn=`✓ Marsh funnel ${msh} sec/qt — acceptable. Est. PV ${Math.max(0,estPV)} cP · YP ${Math.max(0,estYP)} lb/100ft²`;
+  document.getElementById('vis-field-note').className='al '+(msh<35||msh>70?'aw':'aok');
+  document.getElementById('vis-field-note').textContent=fn;
+
+  // Assessment table
+  const rows=[
+    {n:'PV (cP)',v:pv,mn:10,mx:30,imp:'Carrying capacity. Too high = high ECD.'},
+    {n:'YP (lb/100ft²)',v:yp,mn:8,mx:25,imp:'Cuttings suspension. Higher YP for deviated wells.'},
+    {n:'Gel 10sec',v:g10s,mn:5,mx:20,imp:'Prevents settling on connections.'},
+    {n:'Gel 10min',v:g10m,mn:10,mx:35,imp:'Progressive gels preferred — easier to break.'},
+    {n:'Marsh Funnel (sec)',v:msh,mn:35,mx:65,imp:'Overall viscosity — key field indicator.'},
+  ];
+  let issues=0;
+  document.getElementById('vis-tbody').innerHTML=rows.map(r=>{
+    const ok=r.v>=r.mn&&r.v<=r.mx;
+    const cls=ok?'style="color:var(--gr)"':r.v<r.mn?'style="color:var(--wn)"':'style="color:var(--rd)"';
+    const st=ok?'✓ OK':r.v<r.mn?'↑ LOW':'↓ HIGH';
+    if(!ok)issues++;
+    return `<tr><td>${r.n}</td><td ${cls}>${r.v}</td><td style="color:var(--mt)">${r.mn}</td><td style="color:var(--mt)">${r.mx}</td><td ${cls}>${st}</td><td style="color:var(--mt);font-size:10px;">${r.imp}</td></tr>`;
+  }).join('');
+  const sv=document.getElementById('vis-summ');
+  sv.style.display='block';
+  sv.className='al '+(issues===0?'aok':'aw');
+  sv.textContent=issues===0?'✓ Fluid rheology acceptable for milling.':
+    `⚠ ${issues} parameter(s) outside range — poor rheology is leading cause of milling packoffs.`;
+}
+
+// ═══════════════════════ MAIN CALC ═══════════════════════
+function C(){
+  const millOD=GV('millOD')||6;
+  const millType=document.getElementById('millType').value;
+  const millMat=document.getElementById('millMat').value;
+  const casingSize=document.getElementById('casingSize').value;
+  const target=document.getElementById('targetObj').value;
+  const fishMat=document.getElementById('fishMaterial').value;
+  const mudWt=GV('mudWt')||9.5;
+  const flowGPM=GV('flowRate')||3;
+  const maxTorque=GV('maxTorque')||8000;
+  const inc=GV('millingInc')||0;
+  const casingWt=GV('casingWt')||26;
+  const grade=document.getElementById('pipeGrade').value;
+
+  const casingID=getCID();
+  const clearance=casingID-millOD;
+  const mtf=MTF[millType], tgt=TGT[target], mf=MATF[millMat], gf=GF[grade]||1.0;
+  const matData=MAT[fishMat]||MAT['CS'];
+
+  // Material card
+  const mc=document.getElementById('mat-card');
+  mc.textContent=`${fishMat}: ${matData.hint} | Best insert: ${matData.insert}`;
+  mc.className='al '+(matData.h>1.3?'ae':matData.h>1.0?'aw':'aok');
+
+  // Combined hardness
+  const combinedH=tgt.h*matData.h;
+  const matRPMadj=1+(matData.rAdj/100);
+  const matWOBadj=1+(matData.wAdj/100);
+
+  // RPM
+  const millOD_ft=millOD/12;
+  let maxRPM=Math.round((80/(Math.PI*millOD_ft))*mtf.rF*mf.rB*matRPMadj);
+  maxRPM=Math.round(maxRPM*(1-inc*0.003)/Math.sqrt(combinedH));
+  maxRPM=Math.max(10,maxRPM);
+  const optRPM_lo=Math.round(maxRPM*.6), optRPM_hi=Math.round(maxRPM*.85);
+  lastRPM=maxRPM;
+
+  // WOB
+  let maxWOB=parseFloat((millOD*2.8*mtf.wF*mf.wB*matWOBadj/(combinedH*Math.sqrt(gf))).toFixed(1));
+  maxWOB=parseFloat((maxWOB*(1-(inc/90)*0.4)).toFixed(1));
+  maxWOB=Math.max(0.5,maxWOB);
+  const optWOB_lo=+(maxWOB*.5).toFixed(1), optWOB_hi=+(maxWOB*.75).toFixed(1);
+  lastWOB=maxWOB;
+
+  // Torque & Power
+  const estTorq=Math.round((maxWOB*1000*millOD)/(2*12)*mtf.wF*gf*0.5);
+  const torqPct=Math.round((estTorq/maxTorque)*100);
+  const power=Math.round((estTorq*optRPM_hi)/5252);
+
+  // Rate
+  const millingRate=parseFloat((2.5*mtf.rtF/(combinedH)*(optRPM_hi/60)*0.15).toFixed(2));
+
+  // Hydraulics
+  const annArea=(Math.PI/4)*((casingID*casingID)-(millOD*millOD))/144;
+  const av=annArea>0?parseFloat((flowGPM/(7.48*annArea)).toFixed(1)):0;
+
+  // Flow conversions
+  const flowBPM=+(flowGPM/42).toFixed(3);
+  const flowLPM=+(flowGPM*3.785).toFixed(1);
+
+  // Min flow
+  const inc2=inc;
+  const minAV=inc2<30?50:inc2<45?80:inc2<60?100:inc2<75?120:150;
+  const minFlowGPM=+(minAV*annArea*7.48).toFixed(1);
+  const minFlowBPM=+(minFlowGPM/42).toFixed(3);
+  const minFlowLPM=+(minFlowGPM*3.785).toFixed(1);
+  lastMinFlow=minFlowGPM;
+
+  const flowOK=flowGPM>=minFlowGPM;
+
+  // ═══ UPDATE SETUP TAB ═══
+  updMills();
+
+  // ═══ UPDATE FLUID TAB ═══
+  document.getElementById('disp-gpm').textContent=flowGPM.toFixed(1);
+  document.getElementById('disp-bpm').textContent=flowBPM;
+  document.getElementById('disp-lpm').textContent=flowLPM;
+  document.getElementById('gl-flow-max').textContent=Math.max(20,minFlowGPM*1.5).toFixed(0)+' gpm';
+  const gfFlow=document.getElementById('gf-flow');
+  gfFlow.style.width=Math.min(100,(flowGPM/Math.max(20,minFlowGPM*1.5)*100)).toFixed(0)+'%';
+  gfFlow.style.background=flowOK?'var(--gr)':'var(--rd)';
+  const fs=document.getElementById('flow-status');
+  fs.className='al '+(flowOK?'aok':'ae');
+  fs.textContent=flowOK?`✓ Flow ${flowGPM} GPM (${flowBPM} BPM) exceeds min ${minFlowGPM} GPM for ${inc}° inclination.`
+    :`⚠ BELOW MIN — Need ${minFlowGPM} GPM (${minFlowBPM} BPM). Current ${flowGPM} GPM insufficient.`;
+
+  // Min flow boxes
+  document.getElementById('mf-gpm').textContent=minFlowGPM.toFixed(1);
+  document.getElementById('mf-bpm').textContent=minFlowBPM;
+  document.getElementById('mf-lpm').textContent=minFlowLPM;
+  const mfa=document.getElementById('mf-alert');
+  mfa.style.display='block';
+  mfa.className='al '+(flowOK?'aok':'ae');
+  mfa.textContent=flowOK?`✓ Adequate flow for ${inc}° wellbore.`:`⚠ Increase flow to minimum ${minFlowGPM} GPM (${minFlowBPM} BPM) — packoff risk.`;
+
+  // Flow guide table
+  const fgtBody=document.getElementById('fgt-body');
+  [[0,30,50],[30,45,80],[45,60,100],[60,75,120],[75,90,150]].forEach(([lo,hi,mav])=>{
+    const fq=+(mav*annArea*7.48).toFixed(1);
+    const bq=+(fq/42).toFixed(3);
+    const isMe=inc2>=lo&&inc2<hi;
+    const ok=flowGPM>=fq;
+    const tr=document.createElement('tr');
+    if(isMe) tr.style.background='rgba(167,139,250,.08)';
+    tr.innerHTML=`<td style="${isMe?'color:var(--pu)':''}">${lo}–${hi}°${isMe?' ◀':''}</td><td>${mav} ft/min</td><td>${fq} gpm</td><td>${bq} bpm</td><td style="color:${ok?'var(--gr)':'var(--rd)'}">${ok?'✓':'✗ LOW'}</td>`;
+    fgtBody.appendChild(tr);
+  });
+  calcVis();
+
+  // ═══ RESULTS TAB ═══
+  // RPM
+  document.getElementById('r-rpm').innerHTML=`${maxRPM}<span class="ru">RPM</span>`;
+  document.getElementById('r-rpm-rng').textContent=`Optimal: ${optRPM_lo}–${optRPM_hi} RPM`;
+  document.getElementById('g-rpm-mx').textContent=Math.max(200,maxRPM+20);
+  document.getElementById('g-rpm').style.width=Math.min(100,(maxRPM/(maxRPM+20))*100)+'%';
+
+  // WOB
+  document.getElementById('r-wob').innerHTML=`${D(maxWOB,'klbs')}<span class="ru">${U('klbs')}</span>`;
+  document.getElementById('r-wob-rng').textContent=`Optimal: ${D(optWOB_lo,'klbs')}–${D(optWOB_hi,'klbs')} ${U('klbs')}`;
+  document.getElementById('g-wob-mx').textContent=D(maxWOB+2,'klbs');
+  document.getElementById('g-wob').style.width=Math.min(100,(maxWOB/(maxWOB+2))*100)+'%';
+
+  // Alert
+  const ra=document.getElementById('r-alert');
+  ra.style.display='block';
+  if(clearance<0){ra.className='al ae';ra.textContent='⛔ Mill OD > Casing ID — Cannot run. Reduce mill OD.';}
+  else if(clearance<0.25){ra.className='al ae';ra.textContent=`⚠ TIGHT (${clearance.toFixed(3)}") — Wall contact risk.`;}
+  else if(torqPct>85){ra.className='al aw';ra.textContent=`⚡ Torque ${torqPct}% of limit — monitor continuously.`;}
+  else{ra.className='al aok';ra.textContent=`✓ ${millOD}" ${mtf.n} in ${casingSize}" casing · Grade:${grade} · Mat:${fishMat} — Parameters OK.`;}
+
+  // Secondary
+  document.getElementById('r-torq').innerHTML=`${D(estTorq,'ftlbs').toLocaleString()}<span class="ru">${U('ftlbs')}</span>`;
+  const tpEl=document.getElementById('r-tpct');
+  tpEl.textContent=`${torqPct}% of limit`;
+  tpEl.style.color=torqPct>85?'var(--rd)':torqPct>65?'var(--wn)':'var(--mt)';
+  document.getElementById('r-pwr').textContent=`${power} HP`;
+  document.getElementById('r-flow-gpm').textContent=`${flowGPM.toFixed(1)} GPM`;
+  document.getElementById('r-flow-bpm').textContent=`${flowBPM} BPM`;
+  document.getElementById('r-av').textContent=`${D(av,'ftmin')} ${U('ftmin')}`;
+  document.getElementById('r-rate').textContent=`${D(millingRate,'fph')} ${U('fph')}`;
+  document.getElementById('r-clr').textContent=`${clearance.toFixed(3)}"`;
+  document.getElementById('r-inc').innerHTML=`${inc}<span class="ru">°</span>`;
+  document.getElementById('r-dls').textContent=lastDLS>0?`${lastDLS.toFixed(2)} °/100ft`:'Run DLS calc';
+  document.getElementById('r-dlsc').textContent=lastDLS<=0?'':lastDLS<1?'Low':lastDLS<3?'Moderate':lastDLS<6?'High':'SEVERE';
+
+  // Diagram
+  document.getElementById('d-cas').textContent=`${casingSize}" · ${casingWt} lb/ft`;
+  document.getElementById('d-mt').textContent=mtf.n.substring(0,10).toUpperCase();
+  document.getElementById('d-mo').textContent=`${millOD}" OD · ${fishMat}`;
+  document.getElementById('d-tl').textContent=tgt.n.substring(0,8).toUpperCase();
+  document.getElementById('d-clr').textContent=clearance.toFixed(2)+'"';
+  document.getElementById('d-chips').innerHTML=`
+    <span class="ch ${clearance>0.5?'cg':clearance>0.25?'ca':'cr'}">${clearance.toFixed(3)}" CLR</span>
+    <span class="ch cb">${casingID.toFixed(3)}"ID</span>
+    <span class="ch ca">${millOD}"OD</span>
+    <span class="ch cp">${inc}° Inc</span>
+    <span class="ch" style="border-color:var(--pk);color:var(--pk);">${fishMat}</span>`;
+
+  // Summary
+  document.getElementById('sum-body').innerHTML=`
+    <tr class="hi"><td>Max RPM</td><td>${maxRPM} RPM</td></tr>
+    <tr class="hi"><td>Max WOB</td><td>${D(maxWOB,'klbs')} ${U('klbs')}</td></tr>
+    <tr><td>Optimal RPM</td><td>${optRPM_lo}–${optRPM_hi} RPM</td></tr>
+    <tr><td>Optimal WOB</td><td>${D(optWOB_lo,'klbs')}–${D(optWOB_hi,'klbs')} ${U('klbs')}</td></tr>
+    <tr><td>Est. Torque</td><td>${D(estTorq,'ftlbs').toLocaleString()} ${U('ftlbs')}</td></tr>
+    <tr class="${flowOK?'ok':'wr'}"><td>Min Flow</td><td>${minFlowGPM} GPM / ${minFlowBPM} BPM</td></tr>
+    <tr class="${flowOK?'ok':'wr'}"><td>Your Flow</td><td>${flowGPM} GPM / ${flowBPM} BPM ${flowOK?'':'⚠'}</td></tr>
+    <tr><td>Annular Velocity</td><td>${D(av,'ftmin')} ${U('ftmin')}</td></tr>
+    <tr><td>Expected ROP</td><td>${D(millingRate,'fph')} ${U('fph')}</td></tr>
+    <tr><td>Casing Clearance</td><td>${clearance.toFixed(3)}"</td></tr>
+    <tr><td>Fish Material</td><td>${fishMat}</td></tr>
+    <tr><td>DLS at Mill</td><td>${lastDLS>0?lastDLS.toFixed(2)+' °/100ft':'Not calc.'}</td></tr>`;
+
+  // Cautions
+  const ca=[];
+  if(clearance<0) ca.push({c:'ae',t:'⛔ Mill OD exceeds casing ID — cannot run this configuration.'});
+  if(clearance<0.5&&clearance>=0) ca.push({c:'aw',t:`⚠ Tight clearance (${clearance.toFixed(3)}") — casing wall damage risk. Reduce WOB 40%.`});
+  if(inc>30) ca.push({c:'aw',t:`Deviated (${inc}°) — WOB efficiency ~${((1-inc/90*0.4)*100).toFixed(0)}%. Pick up every 15 min to circulate.`});
+  if(!flowOK) ca.push({c:'ae',t:`⚠ Flow ${flowGPM} GPM below minimum ${minFlowGPM} GPM (${minFlowBPM} BPM) — packoff risk.`});
+  if(torqPct>70) ca.push({c:torqPct>85?'ae':'aw',t:`Torque ${torqPct}% of surface limit — monitor continuously.`});
+  if(lastDLS>3) ca.push({c:'aw',t:`High DLS (${lastDLS.toFixed(1)}°/100ft) — undergauge stabs + flex sub required.`});
+  if(lastDLS>6) ca.push({c:'ae',t:`SEVERE DLS — PDM motor required. Max 30% WOB. BHA fatigue risk.`});
+  if(target==='pcp_rotor') ca.push({c:'ae',t:'⭐ MBA FIELD NOTE — Chrome Rotor: Extremely hard (HRC 60+). Two-Pod Muncher or PDC insert mill mandatory. Standard TCR will glaze. Start at 15% max WOB, build slowly. Expect low ROP (0.1–0.3 ft/hr). High torque fluctuation is normal — do NOT suddenly increase WOB when torque drops (glazed insert, not progress).'});
+  if(target==='pcp_stator') ca.push({c:'ai',t:'PCP Stator (SS): Stainless steel tube with rubber/elastomer lining. Rubber mills easily — focus on managing the SS shell. Standard TCR acceptable. Watch for rubber wrapping around inserts at high WOB.'});
+  if(fishMat==='Inconel') ca.push({c:'ae',t:'Inconel — very hard. PDC inserts mandatory. Start at 15% max WOB and build slowly.'});
+  if(fishMat==='13Cr') ca.push({c:'aw',t:'13Cr — reduce RPM by 20% vs standard N80. TCS or PDC inserts recommended.'});
+  ca.push({c:'aok',t:'Always circulate clean before tagging. Dress mill with base oil on first tag-bottom.'});
+  document.getElementById('caut-div').innerHTML=ca.map(x=>`<div class="al ${x.c}" style="margin-bottom:5px">${x.t}</div>`).join('');
+
+  // Auto BHA
+  buildAutoBHA();
+}
+
+// ═══════════════════════ MILL MATRIX ═══════════════════════
+function updMills(){
+  const target=document.getElementById('targetObj').value;
+  const mills=MILLS[target]||MILLS['casing_tubular'];
+  const stars=n=>'<span style="color:var(--accent)">'+'★'.repeat(n)+'</span><span style="color:var(--dm)">'+'★'.repeat(5-n)+'</span>';
+  document.getElementById('mill-matrix').innerHTML=mills.map(m=>`
+    <div class="mc ${m.c}">
+      <div class="mc-name" style="color:${m.c==='best'?'var(--accent)':m.c==='good'?'var(--gr)':'var(--mt)'}">
+        ${m.n} &nbsp;<span style="font-size:11px;">${m.c==='best'?'★ RECOMMENDED':m.c==='good'?'✓ SUITABLE':'✗ NOT IDEAL'}</span>
+      </div>
+      <div class="mc-stars">${stars(m.r)}</div>
+      <div style="font-size:11px;color:var(--mt);margin-top:4px;">${m.d}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════ AUTO BHA ═══════════════════════
+function buildAutoBHA(){
+  const inc=GV('millingInc');
+  const casingSize=document.getElementById('casingSize').value;
+  const millType=document.getElementById('millType').value;
+  const millOD=GV('millOD')||6;
+  const target=document.getElementById('targetObj').value;
+  const dls=lastDLS;
+  const casingID=getCID();
+  const fullGaugeStab=(casingID-0.125).toFixed(3);
+  const ugStab=(casingID-0.35).toFixed(3);
+
+  // BHA TYPE CLASSIFICATION
+  let bhaType='', bhaColor='', bhaDesc='';
+  if(inc<15&&dls<2){
+    bhaType='PACKED ASSEMBLY'; bhaColor='var(--gr)';
+    bhaDesc='Vertical/near-vertical well, low DLS — 3 full-gauge stabilizers for maximum stiffness. Maintains verticality.';
+  } else if(inc<35&&dls<3){
+    bhaType='STIFF ASSEMBLY'; bhaColor='var(--a2)';
+    bhaDesc='Moderate deviation, low-moderate DLS — stabilizer near bit + mid BHA. Holds current inclination.';
+  } else if(inc<60&&dls<6){
+    bhaType='STIFF + FLEX ASSEMBLY'; bhaColor='var(--wn)';
+    bhaDesc='High deviation or significant DLS — undergauge stabs + flex sub to accommodate curvature without fatigue.';
+  } else {
+    bhaType='PENDULUM / MOTOR ASSEMBLY'; bhaColor='var(--rd)';
+    bhaDesc='High deviation (>60°) or severe DLS (>6°/100ft) — pendulum or PDM motor BHA. Reduce surface torque.';
+  }
+  document.getElementById('auto-bha-rec').innerHTML=`
+    <div class="bha-type-badge" style="border-color:${bhaColor};color:${bhaColor};background:rgba(0,0,0,.2);">${bhaType}</div>
+    <div style="font-size:11px;color:var(--mt);margin-bottom:8px;">${bhaDesc}</div>`;
+
+  // Build component list
+  const needFlex=dls>2||inc>45;
+  const needMotor=dls>5||inc>60;
+  const needJar=target==='packer_hydr'||target==='drillstring'||target==='casing_cemented';
+  const needSafety=target==='packer_hydr'||target==='whipstock';
+  const stabOD=inc>30||dls>2?ugStab:fullGaugeStab;
+  const stabType=inc>30||dls>2?'Undergauge Soft-Blade Stab':'Full-Gauge Soft-Blade Stab';
+
+  let comps=[], pos=1;
+  comps.push({p:`#${pos++}`,n:'Workover String / Drill Pipe',s:'5" DP or 3½" TBG — full bore preferred',r:'String to surface. Full bore maximizes flow for cuttings.'});
+  if(needJar) comps.push({p:`#${pos++}`,n:'Hydraulic Jar',s:`Rated for ${casingSize}" string OD`,r:`Essential for ${TGT[target].n} — impact load if mill stalls or stuck.`});
+  if(needSafety) comps.push({p:`#${pos++}`,n:'Safety Joint / Disconnect Sub',s:'Rated for max expected stuck forces',r:'Allows back-off if mill becomes permanently stuck.'});
+  comps.push({p:`#${pos++}`,n:'Drill Collars / HWDP',s:`${inc>45?'1–2':'2–4'} collars inside ${casingSize}" casing`,r:inc>45?'Limited collars — deviated well. WOB limited by string friction.':'WOB source. Keep neutral point above mill.'});
+  if(needMotor) comps.push({p:`#${pos++}`,n:'PDM Motor (Positive Displacement)',s:`${(parseFloat(casingID)-0.75).toFixed(2)}" OD · <1.5° bent housing`,r:`DLS ${dls.toFixed(1)}°/100ft or ${inc}° inc — PDM reduces surface rotation & fatigue risk.`});
+  else if(needFlex) comps.push({p:`#${pos++}`,n:'Flex Sub / Articulated Joint',s:'6"–12" length, rated for BHA OD',r:`DLS ${dls.toFixed(1)}°/100ft — flex sub accommodates curvature.`});
+  comps.push({p:`#${pos++}`,n:stabType,s:`${stabOD}" OD · 1–2 collars above mill`,r:`Centralizes mill. ${inc>30?'Undergauge to reduce casing wear on low side.':'Full-gauge in near-vertical well.'}`});
+  comps.push({p:`#${pos++}`,n:MTF[millType].n,s:`${millOD}" OD — Max ${lastRPM} RPM · ${lastWOB} klbs WOB`,r:`Primary milling tool. ${MAT[document.getElementById('fishMaterial').value]?.hint||''}`});
+  if(target==='junk_metal'||target==='casing_cemented') comps.push({p:`#${pos++}`,n:'Boot Basket / Junk Basket',s:`${(casingID-0.1).toFixed(2)}" OD — below mill`,r:'Captures milled fragments. Critical for junk operations.'});
+
+  document.getElementById('auto-bha-list').innerHTML=comps.map(c=>`
+    <div class="bha-result">
+      <div class="bha-r-pos">${c.p} FROM SURFACE ↓</div>
+      <div class="bha-r-name">${c.n}</div>
+      <div class="bha-r-spec">${c.s}</div>
+      <div class="bha-r-note">${c.r}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════ CUSTOM BHA DESIGNER ═══════════════════════
+const TOOL_TYPES=[
+  'Mill (Flat Bottom)','Mill (Taper)','Mill (Junk)','Mill (Packer)','Mill (Section)','Mill (Two-Pod)',
+  'Stabilizer (Full Gauge)','Stabilizer (Undergauge)','Stabilizer (String)',
+  'Drill Collar (DC)','HWDP','Drill Pipe','PDM Motor',
+  'Hydraulic Jar','Mechanical Jar','Safety Joint','Flex Sub / Knuckle Joint',
+  'Centralizer','Float Sub','Circulation Sub','Boot/Junk Basket','Other'
+];
+
+function addBHASlot(){
+  slotCount++;
+  const pos=slotCount;
+  const div=document.createElement('div');
+  div.className='bha-slot';
+  div.id=`slot-${pos}`;
+  div.innerHTML=`
+    <div class="bha-pos-badge">#${pos} FROM SURFACE ↓</div>
+    <div class="bha-slot-grid">
+      <div><label>Tool / Component</label>
+        <div class="sw"><select id="s-type-${pos}">
+          ${TOOL_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}
+        </select></div>
+      </div>
+      <div><label>OD (inches)</label>
+        <input type="number" id="s-od-${pos}" placeholder="e.g. 5.90" step="0.125" min="1" max="14">
+      </div>
+      <div><label>Length (ft)</label>
+        <input type="number" id="s-len-${pos}" placeholder="e.g. 30" step="1" min="1">
+      </div>
+      <div><label>Notes</label>
+        <input type="text" id="s-note-${pos}" placeholder="Optional notes">
+      </div>
+      <div><label>&nbsp;</label>
+        <button class="btn-del" onclick="removeSlot(${pos})">DEL</button>
+      </div>
+    </div>`;
+  document.getElementById('bha-slots').appendChild(div);
+}
+
+function removeSlot(pos){
+  const el=document.getElementById(`slot-${pos}`);
+  if(el) el.remove();
+}
+
+function analyzeBHA(){
+  const slots=document.querySelectorAll('.bha-slot');
+  if(slots.length===0){
+    document.getElementById('bha-analysis').innerHTML='<div class="al ae">Add at least one component first.</div>';
+    return;
+  }
+
+  let comps=[];
+  let totalLen=0, stabCount=0, stabPositions=[], millPos=-1, motorPresent=false, jarPresent=false, flexPresent=false;
+
+  slots.forEach((s,idx)=>{
+    const id=s.id.replace('slot-','');
+    const type=document.getElementById(`s-type-${id}`)?.value||'';
+    const od=parseFloat(document.getElementById(`s-od-${id}`)?.value)||0;
+    const len=parseFloat(document.getElementById(`s-len-${id}`)?.value)||0;
+    const note=document.getElementById(`s-note-${id}`)?.value||'';
+    comps.push({pos:idx+1,type,od,len,note});
+    totalLen+=len;
+    if(type.includes('Stabilizer')) {stabCount++; stabPositions.push(idx);}
+    if(type.includes('Mill')&&millPos===-1) millPos=idx;
+    if(type.includes('Motor')) motorPresent=true;
+    if(type.includes('Jar')) jarPresent=true;
+    if(type.includes('Flex')||type.includes('Knuckle')) flexPresent=true;
+  });
+
+  const inc=GV('millingInc');
+  const dls=lastDLS;
+  const casingID=getCID();
+
+  // Check ODs vs casing
+  let odIssues=[];
+  comps.forEach(c=>{if(c.od>0&&c.od>=casingID) odIssues.push(`${c.type} OD ${c.od}" exceeds casing ID ${casingID.toFixed(3)}"`);});
+
+  // Classify BHA
+  let classification='', classColor='', classDesc='', classRec='';
+  const millToFirstStab=millPos>=0&&stabPositions.length>0?stabPositions[0]-millPos:99;
+
+  if(stabCount===0){
+    classification='PENDULUM'; classColor='var(--pu)';
+    classDesc='No stabilizers — pendulum assembly. Bit free to swing toward vertical.';
+    classRec=inc<30?'✓ Good for dropping inclination in this well.':inc<60?'⚠ Pendulum at this deviation — limited WOB transfer. Monitor torque.':'⚠ High deviation pendulum — limited effectiveness. Consider stiff.';
+  } else if(stabCount>=3){
+    classification='PACKED'; classColor='var(--gr)';
+    classDesc='3+ stabilizers — packed assembly. Maximum stiffness for vertical wells.';
+    classRec=inc<20?'✓ Good choice for this near-vertical well.':inc>45?'⚠ Packed assembly in deviated well — high side loading risk on stabs. Prefer stiff.':'Acceptable for hold section.';
+  } else if(stabCount===1&&millToFirstStab<=2){
+    classification='STIFF'; classColor='var(--a2)';
+    classDesc='Single stabilizer near bit — stiff assembly. Holds current inclination.';
+    classRec=inc<60?'✓ Good stiff assembly for this deviation.':'⚠ Consider adding flex sub above stab for high deviation.';
+  } else if(stabCount===2){
+    classification='STIFF'; classColor='var(--a2)';
+    classDesc='Two stabilizers — stiff assembly. Standard for hold sections.';
+    classRec=dls>3?'⚠ Consider undergauge stabs given DLS value.':'✓ Adequate for this DLS and deviation.';
+  } else {
+    classification='STIFF (MODIFIED)'; classColor='var(--wn)';
+    classDesc='Stabilizer not near bit — modified stiff. Less predictable behavior.';
+    classRec='Consider repositioning stabilizer closer to mill (within 2 components).';
+  }
+
+  // Additional checks
+  const checks=[];
+  if(inc>45&&!flexPresent) checks.push({c:'aw',t:'High deviation — consider adding flex sub or articulated joint to reduce BHA fatigue.'});
+  if(dls>3&&!flexPresent) checks.push({c:'aw',t:`DLS ${dls.toFixed(1)}°/100ft — flex sub recommended between stab and DC.`});
+  if(inc>60&&!motorPresent) checks.push({c:'aw',t:'Deviation >60° — PDM motor would reduce surface torque and improve ROP.'});
+  if(!jarPresent&&(TGT[document.getElementById('targetObj').value]?.h||1)>1.2) checks.push({c:'aw',t:'Hard fish target — hydraulic jar recommended in BHA for overpull/impact capability.'});
+  if(odIssues.length) odIssues.forEach(e=>checks.push({c:'ae',t:`⛔ OD ISSUE: ${e}`}));
+  checks.push({c:'aok',t:`BHA total length: ${totalLen} ft. Stabilizer count: ${stabCount}. ${motorPresent?'Motor: Yes.':''} ${jarPresent?'Jar: Yes.':''}`});
+
+  // Build output table
+  document.getElementById('bha-analysis').innerHTML=`
+    <div class="bha-type-badge" style="border-color:${classColor};color:${classColor};background:rgba(0,0,0,.2);margin-bottom:8px;">${classification}</div>
+    <div style="font-size:12px;color:var(--mt);margin-bottom:4px;">${classDesc}</div>
+    <div class="al ${classRec.startsWith('✓')?'aok':classRec.startsWith('⚠')?'aw':'ai'}" style="margin-bottom:10px;font-size:11px;">${classRec}</div>
+    <table class="tb" style="margin-bottom:10px;">
+      <thead><tr><th>#</th><th>Component</th><th>OD (in)</th><th>Length (ft)</th><th>Check</th></tr></thead>
+      <tbody>${comps.map(c=>`<tr>
+        <td>${c.pos}</td>
+        <td>${c.type}${c.note?` (${c.note})`:''}</td>
+        <td style="color:${c.od>0&&c.od>=casingID?'var(--rd)':'var(--a2)'}">${c.od||'—'}"</td>
+        <td>${c.len||'—'} ft</td>
+        <td style="color:${c.od>0&&c.od<casingID?'var(--gr)':'var(--mt)'}">${c.od>0&&c.od>=casingID?'⛔ OD ISSUE':c.od>0?'✓':'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    ${checks.map(x=>`<div class="al ${x.c}" style="margin-bottom:5px;font-size:11px;">${x.t}</div>`).join('')}`;
+}
+
+// ═══════════════════════ TAB SWITCH ═══════════════════════
+function ST(id){
+  document.querySelectorAll('.tc').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const idx=['t1','t2','t3','t4','t5','t6','t7'].indexOf(id);
+  document.querySelectorAll('.tab')[idx].classList.add('on');
+  if(id==='t5') updMills();
+  if(id==='t6') buildAutoBHA();
+  // Clear flow guide table on tab switch to prevent duplication
+  if(id==='t2'){const fb=document.getElementById('fgt-body');if(fb)fb.innerHTML='';}
+}
+
+// ═══════════════════════ INIT ═══════════════════════
+window.onload=function(){
+  updCW(); updLabels(); calcDLS();
+  // Add 3 default BHA slots
+  addBHASlot(); addBHASlot(); addBHASlot();
+  // Set some defaults
+  document.getElementById('s-type-1').value='Mill (Flat Bottom)';
+  document.getElementById('s-od-1').value='6';
+  document.getElementById('s-len-1').value='2';
+  document.getElementById('s-type-2').value='Stabilizer (Undergauge)';
+  document.getElementById('s-od-2').value='5.90';
+  document.getElementById('s-len-2').value='8';
+  document.getElementById('s-type-3').value='Drill Collar (DC)';
+  document.getElementById('s-od-3').value='4.75';
+  document.getElementById('s-len-3').value='30';
+  C();
+};
+</script>
+</body>
+</html>

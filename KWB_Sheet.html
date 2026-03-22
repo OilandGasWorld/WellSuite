@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KWB Sheet — MBA Field v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c12;--surface:#0f1620;--panel:#131d28;
+  --border:#1a2d40;--accent:#f59e0b;--a2:#38bdf8;--gr:#22c55e;
+  --rd:#ef4444;--wn:#f97316;--pu:#a78bfa;
+  --tx:#e2e8f0;--mt:#64748b;--dm:#374151;
+  --mono:'Share Tech Mono',monospace;
+  --hd:'Barlow Condensed',sans-serif;
+  --bd:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:var(--bd);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(56,189,248,.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(56,189,248,.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:20px 16px 60px;}
+
+/* HEADER */
+.hdr{display:flex;align-items:flex-end;justify-content:space-between;
+  border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.htag{font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.15em;margin-bottom:3px;}
+.htitle{font-family:var(--hd);font-size:34px;font-weight:900;color:#fff;line-height:1;}
+.htitle span{color:var(--accent);}
+.hsub{font-size:12px;color:var(--mt);margin-top:3px;font-weight:300;}
+.hbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border:1px solid var(--gr);
+  color:var(--gr);border-radius:2px;letter-spacing:.1em;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.btn-print{padding:8px 16px;background:transparent;border:1px solid var(--border);
+  color:var(--mt);font-family:var(--mono);font-size:11px;border-radius:2px;
+  cursor:pointer;transition:all .2s;letter-spacing:.07em;}
+.btn-print:hover{border-color:var(--accent);color:var(--accent);}
+
+/* FIELD TABS */
+.ftabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.ftab{font-family:var(--mono);font-size:11px;padding:8px 20px;border:1px solid var(--border);
+  background:transparent;color:var(--mt);cursor:pointer;border-radius:3px;
+  letter-spacing:.08em;transition:all .2s;}
+.ftab.on{color:#000;font-weight:700;}
+.fa.on{background:var(--accent);border-color:var(--accent);}
+.fm.on{background:var(--gr);border-color:var(--gr);}
+.fb.on{background:var(--pu);border-color:var(--pu);}
+.fc.on{background:var(--a2);border-color:var(--a2);}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
+@media(max-width:800px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+/* PANEL */
+.p{background:var(--panel);border:1px solid var(--border);border-radius:4px;
+  padding:16px;position:relative;overflow:hidden;}
+.p::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--a2),transparent);}
+.pa::before{background:linear-gradient(90deg,var(--accent),transparent);}
+.pg::before{background:linear-gradient(90deg,var(--gr),transparent);}
+.pp::before{background:linear-gradient(90deg,var(--pu),transparent);}
+.pr::before{background:linear-gradient(90deg,var(--rd),transparent);}
+.pw::before{background:linear-gradient(90deg,var(--wn),transparent);}
+.pl{font-family:var(--mono);font-size:10px;color:var(--a2);letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.pl::after{content:'';flex:1;height:1px;background:var(--border);}
+.pa .pl{color:var(--accent);}
+.pg .pl{color:var(--gr);}
+.pp .pl{color:var(--pu);}
+.pr .pl{color:var(--rd);}
+.pw .pl{color:var(--wn);}
+
+/* FORM */
+.fi{margin-bottom:10px;}.fi:last-child{margin-bottom:0;}
+label{display:block;font-size:11px;font-weight:500;color:var(--mt);
+  text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+input[type=number],input[type=text],select{
+  width:100%;background:var(--surface);border:1px solid var(--border);color:var(--tx);
+  font-family:var(--mono);font-size:13px;padding:7px 10px;border-radius:3px;
+  outline:none;transition:border-color .2s;appearance:none;}
+input:focus,select:focus{border-color:var(--accent);}
+input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
+.sw{position:relative;}
+.sw::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  color:var(--mt);pointer-events:none;font-size:11px;}
+.uh{font-size:10px;color:var(--mt);font-family:var(--mono);margin-top:2px;}
+.locked{opacity:.5;pointer-events:none;}
+.lbadge{font-family:var(--mono);font-size:9px;color:var(--accent);
+  background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+  padding:1px 6px;border-radius:2px;margin-left:5px;vertical-align:middle;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+
+/* RANGE SLIDER */
+.range-wrap{margin-top:4px;}
+.range-row{display:flex;justify-content:space-between;font-family:var(--mono);
+  font-size:10px;color:var(--mt);margin-top:3px;}
+.range-cur{font-family:var(--mono);font-size:16px;color:var(--accent);
+  text-align:center;margin-top:4px;font-weight:700;}
+
+/* CALCULATE BUTTON */
+.calc-btn{width:100%;padding:14px;background:var(--accent);color:#000;
+  font-family:var(--hd);font-size:20px;font-weight:900;letter-spacing:.12em;
+  text-transform:uppercase;border:none;border-radius:4px;cursor:pointer;
+  transition:all .15s;margin-top:4px;}
+.calc-btn:hover{background:#fbbf24;transform:translateY(-1px);}
+.calc-btn:active{transform:translateY(0);}
+
+/* RESULTS */
+.rv{font-family:var(--mono);font-size:28px;color:var(--accent);line-height:1;}
+.rv.b{color:var(--a2);}.rv.g{color:var(--gr);}.rv.r{color:var(--rd);}.rv.p{color:var(--pu);}
+.rv.w{color:var(--wn);}
+.ru{font-size:12px;color:var(--mt);margin-left:2px;}
+.rs{font-size:10px;color:var(--mt);font-family:var(--mono);margin-top:2px;line-height:1.5;}
+
+/* BRINE BADGE */
+.brine-badge{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:700;
+  padding:6px 16px;border-radius:3px;border:1px solid;margin-top:4px;}
+
+/* VOLUME ZONE BOX */
+.zone-box{background:var(--surface);border:1px solid var(--border);border-radius:4px;
+  padding:12px;margin-bottom:8px;}
+.zone-title{font-family:var(--mono);font-size:10px;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:8px;}
+.zone-row{display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:11px;color:var(--mt);margin-bottom:4px;}
+.zone-val{color:var(--a2);font-size:13px;font-weight:700;}
+.zone-total{border-top:1px solid var(--border);margin-top:8px;padding-top:8px;
+  display:flex;justify-content:space-between;align-items:center;}
+.zone-total-val{font-family:var(--mono);font-size:18px;color:var(--gr);font-weight:700;}
+
+/* ALERTS */
+.al{padding:8px 12px;border-radius:3px;font-size:11px;font-family:var(--mono);
+  margin-top:6px;border-left:3px solid;line-height:1.5;}
+.aok{border-color:var(--gr);background:rgba(34,197,94,.06);color:var(--gr);}
+.aw{border-color:var(--wn);background:rgba(249,115,22,.06);color:var(--wn);}
+.ae{border-color:var(--rd);background:rgba(239,68,68,.06);color:var(--rd);}
+.ai{border-color:var(--a2);background:rgba(56,189,248,.06);color:var(--a2);}
+.ap{border-color:var(--pu);background:rgba(167,139,250,.06);color:var(--pu);}
+
+/* STEP TABLE */
+.stbl{width:100%;border-collapse:collapse;font-size:11px;}
+.stbl th{font-family:var(--mono);font-size:9px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--mt);text-align:left;padding:5px 8px;
+  border-bottom:1px solid var(--border);}
+.stbl td{padding:5px 8px;font-family:var(--mono);font-size:11px;
+  border-bottom:1px solid rgba(26,45,64,.4);}
+.stbl tr:last-child td{border-bottom:none;}
+.stbl td:first-child{color:var(--mt);}
+.stbl td:nth-child(2){color:var(--a2);}
+.stbl td:last-child{text-align:right;color:var(--accent);}
+.stbl .final td{color:var(--gr)!important;font-size:12px;}
+.stbl .hi td{color:var(--accent)!important;}
+
+/* DEPTH DIAGRAM */
+.depth-diag{width:100%;font-family:var(--mono);font-size:11px;}
+
+/* SECTION TITLE */
+.st{font-family:var(--hd);font-size:11px;font-weight:700;color:var(--mt);
+  text-transform:uppercase;letter-spacing:.15em;margin:16px 0 10px;
+  display:flex;align-items:center;gap:10px;}
+.st::before,.st::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PRINT */
+@media print{
+  body{background:#fff!important;color:#000!important;}
+  body::before{display:none;}
+  .no-print{display:none!important;}
+  .wrap{padding:8px;max-width:100%;}
+  .p{background:#f8f9fa!important;border:1px solid #ccc!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .p::before{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .rv{color:#1B3A5C!important;}
+  .rv.g{color:#166534!important;}
+  .rv.b{color:#1e40af!important;}
+  .rv.p{color:#6b21a8!important;}
+  .rv.w{color:#854d0e!important;}
+  .al,.aok,.aw,.ae,.ai,.ap{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .aok{background:#dcfce7!important;color:#166534!important;}
+  .aw{background:#fef9c3!important;color:#854d0e!important;}
+  .ae{background:#fee2e2!important;color:#991b1b!important;}
+  .ai{background:#e0f2fe!important;color:#0369a1!important;}
+  .ap{background:#f3e8ff!important;color:#6b21a8!important;}
+  .stbl td,.stbl th{color:#000!important;}
+  .stbl td:nth-child(2){color:#1e40af!important;}
+  .stbl td:last-child{color:#1B3A5C!important;}
+  .stbl .final td{color:#166534!important;}
+  .brine-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .zone-box{background:#f0f4f8!important;border:1px solid #ccc!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .zone-val,.zone-total-val{color:#1B3A5C!important;}
+  canvas{max-width:100%!important;}
+  .htitle,.htitle span,.htag,.hsub{color:#000!important;}
+  .calc-btn{display:none!important;}
+  #results-section{display:block!important;}
+  .range-wrap input[type=range]{display:none;}
+  .range-cur{color:#000!important;}
+  .pl::after{background:#ccc!important;}
+  .st::before,.st::after{background:#ccc!important;}
+  .g4{grid-template-columns:1fr 1fr!important;}
+}
+.print-hdr{display:none;}
+@media print{
+  .print-hdr{display:block;text-align:center;margin-bottom:12px;
+    padding-bottom:8px;border-bottom:2px solid #1B3A5C;}
+  .print-hdr h1{font-family:'Barlow Condensed',sans-serif;font-size:26px;
+    font-weight:900;color:#1B3A5C;}
+  .print-hdr p{font-size:11px;color:#555;margin-top:3px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="print-hdr">
+  <h1>KILL WEIGHT BRINE — MBA FIELD</h1>
+  <p id="ph-sub">Vedanta–Cairn Oil & Gas</p>
+</div>
+
+<!-- HEADER -->
+<div class="hdr no-print">
+  <div>
+    <div class="htag">MBA Field · Vedanta–Cairn O&G · Well Intervention · v3.0</div>
+    <div class="htitle">KILL WEIGHT <span>BRINE</span></div>
+    <div class="hsub">Mangala · Bhagyam · Aishwarya · TVDRT Corrected · Volume Calculator</div>
+  </div>
+  <div class="hbtns">
+    <a href="WellSuite_Index.html" style="padding:8px 16px;background:transparent;border:1px solid var(--border);
+      color:var(--mt);font-family:var(--mono);font-size:11px;border-radius:2px;
+      cursor:pointer;text-decoration:none;letter-spacing:.07em;transition:all .2s;display:inline-block;"
+      onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--mt)'">
+      ← WELLSUITE
+    </a>
+    <div class="badge">© 2025 BALA</div>
+    <button class="btn-print no-print" onclick="window.print()">🖨 PRINT / PDF</button>
+  </div>
+</div>
+
+<!-- FIELD SELECTOR -->
+<div class="ftabs no-print">
+  <button class="ftab fa on" onclick="SF('A')">AISHWARYA</button>
+  <button class="ftab fm"    onclick="SF('M')">MANGALA</button>
+  <button class="ftab fb"    onclick="SF('B')">BHAGYAM</button>
+  <button class="ftab fc"    onclick="SF('C')">CUSTOM</button>
+</div>
+
+<!-- ═══ SECTION 1: JOB & FIELD INFO ═══ -->
+<div class="st">Section 1 — Job & Field Information</div>
+<div class="g3">
+
+  <!-- Job Info -->
+  <div class="p">
+    <div class="pl">Job Details</div>
+    <div class="fi"><label>Well Name</label>
+      <input type="text" id="wellName" placeholder="e.g. MGN-240H">
+    </div>
+    <div class="fi"><label>Date</label>
+      <input type="text" id="jobDate">
+    </div>
+    <div class="fi"><label>Engineer Name</label>
+      <input type="text" id="engName" placeholder="Bal Krishna">
+    </div>
+    <div class="fi"><label>Job Type / Remarks</label>
+      <input type="text" id="jobType" placeholder="e.g. ESP Changeout">
+    </div>
+  </div>
+
+  <!-- Field Fixed Params -->
+  <div class="p pa">
+    <div class="pl">Field Parameters</div>
+    <div class="fi">
+      <label>Field <span class="lbadge" id="lbf">AUTO</span></label>
+      <div class="sw"><select id="fldSel" onchange="SF(this.value)">
+        <option value="A">Aishwarya</option>
+        <option value="M">Mangala</option>
+        <option value="B">Bhagyam</option>
+        <option value="C">Custom</option>
+      </select></div>
+    </div>
+    <div class="fi">
+      <label>OWC TVD (m TVDSS) <span class="lbadge" id="owc-badge">FIXED</span></label>
+      <input type="number" id="owcTVD" step="0.1">
+      <div class="uh" id="owc-hint"></div>
+    </div>
+    <div class="fi">
+      <label>Pressure at OWC (psi) <span class="lbadge" id="owcp-badge">FIXED</span></label>
+      <input type="number" id="owcPres" step="1">
+      <div class="uh" id="owcp-hint">Known from field RFT/PLT data</div>
+    </div>
+    <div class="fi">
+      <label>Thermal Gradient (°C/100m) <span class="lbadge" id="tg-badge">FIXED</span></label>
+      <input type="number" id="tempGrad" step="0.1">
+      <div class="uh" id="tg-hint"></div>
+    </div>
+    <div class="fi">
+      <label>Surface Temp (°C)</label>
+      <input type="number" id="surfTemp" value="25" step="0.5">
+    </div>
+  </div>
+
+  <!-- Elevation / TVDRT -->
+  <div class="p pw">
+    <div class="pl">Elevation Correction (TVDSS → TVDRT)</div>
+    <div class="al aw" style="margin-bottom:10px;font-size:10px;">
+      TVDRT = TVDSS + Ground Elevation + Rig Height
+    </div>
+    <div class="fi">
+      <label>Ground Elevation (m above sea level)</label>
+      <input type="number" id="groundElev" placeholder="e.g. 160" step="0.1">
+      <div class="uh">Well site elevation above MSL</div>
+    </div>
+    <div class="fi">
+      <label>Rig Height — Ground to RT (m)</label>
+      <input type="number" id="rigHeight" placeholder="e.g. 4.7" step="0.1">
+      <div class="uh">Rotary table height above ground</div>
+    </div>
+    <div style="margin-top:10px;background:var(--surface);border:1px solid var(--border);
+      border-radius:3px;padding:8px;">
+      <div style="font-size:10px;color:var(--mt);font-family:var(--mono);margin-bottom:3px;">
+        TOTAL RT ELEVATION ABOVE MSL
+      </div>
+      <div style="font-family:var(--mono);font-size:18px;color:var(--wn);" id="rt-elev-disp">
+        — m
+      </div>
+      <div style="font-size:10px;color:var(--mt);font-family:var(--mono);margin-top:2px;" id="rt-elev-note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 2: FLUID GRADIENT ═══ -->
+<div class="st">Section 2 — Fluid Gradient</div>
+<div class="g2">
+  <div class="p">
+    <div class="pl">Gradient Input</div>
+    <!-- Fixed (Aishwarya) -->
+    <div id="grad-fixed" class="fi">
+      <label>Fluid Gradient (psi/m) <span class="lbadge">FIXED</span></label>
+      <input type="number" id="gradFixed" step="0.001" value="1.17" class="locked">
+      <div class="uh" id="grad-fixed-hint">Aishwarya = 1.17 psi/m (fixed)</div>
+    </div>
+    <!-- Range (Mangala / Bhagyam) -->
+    <div id="grad-range" style="display:none;">
+      <label id="grad-range-lbl">Fluid Gradient (psi/m)</label>
+      <div class="range-wrap">
+        <input type="range" id="gradSlider" step="0.01" oninput="onSlider()">
+        <div class="range-row">
+          <span id="grad-min-lbl"></span>
+          <span style="color:var(--mt);font-size:10px;">← drag slider →</span>
+          <span id="grad-max-lbl"></span>
+        </div>
+        <div class="range-cur" id="grad-cur">—</div>
+      </div>
+      <div class="uh" id="grad-range-hint"></div>
+    </div>
+    <!-- Custom -->
+    <div id="grad-custom" style="display:none;" class="fi">
+      <label>Fluid Gradient (psi/m)</label>
+      <input type="number" id="gradCustom" step="0.001" placeholder="e.g. 1.22">
+    </div>
+    <div id="plt-note" class="al ai" style="margin-top:8px;display:none;font-size:10px;"></div>
+  </div>
+
+  <div class="p">
+    <div class="pl">Pressure Correction</div>
+    <div class="fi">
+      <label>Depletion / Overpressure (psi)</label>
+      <input type="number" id="depletion" value="0" step="1">
+      <div class="uh">Negative = depleted · Positive = overpressured · From RFT/PLT</div>
+    </div>
+    <div class="fi">
+      <label>Current Brine in Hole (ppg) — optional</label>
+      <input type="number" id="currBrine" placeholder="e.g. 8.6" step="0.01">
+      <div class="uh">Used to check overbalance vs calculated KWB</div>
+    </div>
+    <div class="al ai" style="margin-top:8px;font-size:10px;">
+      Safety overbalance = auto-calculated. Whichever is less: 200 psi equivalent OR 0.8 ppg at top perf TVDRT.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION 3: WELL DEPTHS ═══ -->
+<div class="st">Section 3 — Well Depths (Enter in m TVDRT — as measured from Rotary Table)</div>
+<div class="g2">
+  <div class="p pa">
+    <div class="pl">Depth Inputs (TVDRT)</div>
+    <div class="al aw" style="margin-bottom:10px;font-size:10px;">
+      Enter all depths as measured from Rotary Table (TVDRT). OWC is in TVDSS — conversion is automatic.
+    </div>
+    <div class="fi">
+      <label>Top Perforation (m TVDRT)</label>
+      <input type="number" id="topPerfTVD" placeholder="e.g. 1115" step="0.5" oninput="updateConversions()">
+      <div class="uh" id="tp-tvdss-hint">TVDSS will show below after entering RT elevation</div>
+    </div>
+    <div class="fi">
+      <label>End of Tubing String (m TVDRT)</label>
+      <input type="number" id="eotTVD" placeholder="e.g. 1085" step="0.5" oninput="updateConversions()">
+      <div class="uh" id="eot-tvdss-hint">TVDSS will show below</div>
+    </div>
+    <div class="fi">
+      <label>Tubing Top / String Top (m TVDRT)</label>
+      <input type="number" id="tubTop" placeholder="e.g. 164.7 (= RT level)" step="0.5" oninput="updateConversions()">
+      <div class="uh">Usually = RT elevation (i.e. surface). Enter actual value if liner.</div>
+    </div>
+    <!-- Live TVDSS conversion display -->
+    <div style="margin-top:12px;background:var(--surface);border:1px solid var(--border);
+      border-radius:3px;padding:10px;">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--mt);
+        text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">
+        TVDRT → TVDSS Conversion (for OWC comparison)
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+        <div>
+          <div style="font-size:9px;color:var(--mt);font-family:var(--mono);">Top Perf TVDSS</div>
+          <div style="font-family:var(--mono);font-size:14px;color:var(--a2);" id="tp-tvdss-disp">—</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--mt);font-family:var(--mono);">EOT TVDSS</div>
+          <div style="font-family:var(--mono);font-size:14px;color:var(--a2);" id="eot-tvdss-disp">—</div>
+        </div>
+        <div>
+          <div style="font-size:9px;color:var(--mt);font-family:var(--mono);">OWC TVDRT</div>
+          <div style="font-family:var(--mono);font-size:14px;color:var(--gr);" id="owc-tvdrt-disp">—</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--mt);font-family:var(--mono);margin-top:6px;" id="tvdrt-formula">
+        TVDSS = TVDRT − RT elevation
+      </div>
+    </div>
+  </div>
+
+  <!-- DEPTH DIAGRAM -->
+  <div class="p">
+    <div class="pl">Depth Schematic</div>
+    <canvas id="depthDiag" height="220" style="width:100%;"></canvas>
+  </div>
+</div>
+
+<!-- ═══ SECTION 4: CASING & TUBING ═══ -->
+<div class="st">Section 4 — Casing & Tubing Configuration</div>
+<div class="g2">
+  <div class="p">
+    <div class="pl">Casing Configuration</div>
+    <div class="fi">
+      <label>Casing Size</label>
+      <div class="sw"><select id="casingConfig" onchange="onCasingSelect()">
+        <option value="9625">9⅝" Casing</option>
+        <option value="7">7" Casing</option>
+        <option value="custom">Custom</option>
+      </select></div>
+    </div>
+    <div class="fi" id="ppf-row">
+      <label>Casing Weight (lb/ft) <span class="lbadge">SELECT PPF</span></label>
+      <div class="sw"><select id="casingPPF" onchange="onPPFSelect()">
+        <option value="">-- Select weight --</option>
+      </select></div>
+      <div class="uh" id="ppf-hint"></div>
+    </div>
+    <div class="fi">
+      <label>Casing ID (inches) <span class="lbadge" id="cid-badge">AUTO</span></label>
+      <input type="number" id="casingID" step="0.001">
+      <div class="uh" id="cid-hint">ID auto-fills based on size + weight selection</div>
+    </div>
+    <div class="fi">
+      <label>Casing Shoe Depth (m TVDRT) — optional</label>
+      <input type="number" id="casingShoe" placeholder="e.g. 1200" step="1">
+      <div class="uh">Reference only — not used in calculation</div>
+    </div>
+  </div>
+
+  <div class="p pa">
+    <div class="pl">Tubing / Workstring</div>
+    <div class="fi">
+      <label>Tubing OD (inches)</label>
+      <input type="number" id="tubOD" placeholder="e.g. 3.5" step="0.001">
+      <div class="uh">Outer diameter of workstring / production tubing</div>
+    </div>
+    <div class="fi">
+      <label>Tubing ID (inches)</label>
+      <input type="number" id="tubID" placeholder="e.g. 2.992" step="0.001">
+      <div class="uh">Inner diameter — for tubing fill volume</div>
+    </div>
+    <div class="al ai" style="margin-top:8px;font-size:10px;">
+      Zone 1: Tubing Top → EOT = pump down tubing (tubing ID capacity)<br>
+      Zone 2: EOT → Top Perf = open casing, no tubing (casing ID capacity)
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CALCULATE BUTTON ═══ -->
+<button class="calc-btn no-print" onclick="CALC()">
+  ▶ CALCULATE KILL WEIGHT BRINE
+</button>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="results-section" style="display:none;">
+
+  <div class="st">Results — Pressure & Kill Weight</div>
+  <div class="g4">
+    <!-- OWC & Perf Pressures -->
+    <div class="p pg">
+      <div class="pl">Pressures</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">P at OWC</div>
+        <div class="rv g" style="font-size:20px;" id="r-owc">—<span class="ru">psi</span></div>
+        <div class="rs" id="r-owc-f"></div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">P at Top Perf</div>
+        <div class="rv b" style="font-size:20px;" id="r-perf">—<span class="ru">psi</span></div>
+        <div class="rs" id="r-perf-f"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Reservoir P (corrected)</div>
+        <div class="rv" style="font-size:20px;" id="r-res">—<span class="ru">psi</span></div>
+        <div class="rs" id="r-dep-note"></div>
+      </div>
+    </div>
+
+    <!-- Temp & Brine -->
+    <div class="p">
+      <div class="pl">Temp & Brine</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">BHT at Top Perf</div>
+        <div class="rv p" style="font-size:20px;" id="r-bht">—<span class="ru">°C</span></div>
+        <div class="rs" id="r-bht-f"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Brine Type</div>
+        <div id="r-brine-badge">—</div>
+        <div class="rs" id="r-brine-note"></div>
+      </div>
+    </div>
+
+    <!-- KWB -->
+    <div class="p pp">
+      <div class="pl">KWB Calculation</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">KWB Downhole</div>
+        <div class="rv p" style="font-size:20px;" id="r-kwb-dh">—<span class="ru">ppg</span></div>
+        <div class="rs" id="r-kwb-dh-f"></div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Temp Correction</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--pu);" id="r-tcorr"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Safety Overbalance Used</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--wn);" id="r-ob-used"></div>
+        <div class="rs" id="r-ob-note"></div>
+      </div>
+    </div>
+
+    <!-- FINAL KWB -->
+    <div class="p" style="border:2px solid var(--gr);">
+      <div class="pl" style="color:var(--gr);">Final KWB to Mix</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Surface Mix (25°C)</div>
+        <div class="rv g" style="font-size:24px;" id="r-kwb-surf">—<span class="ru">ppg</span></div>
+      </div>
+      <div style="margin-bottom:6px;">
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">+ Safety Overbalance</div>
+        <div style="font-family:var(--mono);font-size:20px;color:var(--accent);" id="r-kwb-final">
+          —<span style="font-size:11px;color:var(--mt);"> ppg</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--mt);text-transform:uppercase;margin-bottom:1px;">Equiv. SG</div>
+        <div style="font-family:var(--mono);font-size:14px;color:var(--a2);" id="r-kwb-sg">— SG</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS ALERTS -->
+  <div id="status-div"></div>
+
+  <!-- VOLUME RESULTS -->
+  <div class="st">Results — Brine Volume Required</div>
+  <div class="g2">
+    <div class="p pg">
+      <div class="pl">Volume by Zone (Wellbore Fill)</div>
+
+      <!-- Zone 1: Tubing Inside -->
+      <div class="zone-box">
+        <div class="zone-title" style="color:var(--a2);">Zone 1 — Tubing Inside (Surface → EOT)</div>
+        <div class="zone-row"><span>Tubing length</span><span class="zone-val" id="v-tub-len">—</span></div>
+        <div class="zone-row"><span>Tubing ID</span><span class="zone-val" id="v-tub-id">—</span></div>
+        <div class="zone-row"><span>Capacity factor</span><span class="zone-val" id="v-tub-cap">—</span></div>
+        <div class="zone-total">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">Z1 — Tubing fill</span>
+          <span class="zone-total-val" id="v-zone1">— bbls</span>
+        </div>
+      </div>
+
+      <!-- Zone 2: Annulus alongside tubing -->
+      <div class="zone-box">
+        <div class="zone-title" style="color:var(--accent);">Zone 2 — Annulus Alongside Tubing (Surface → EOT)</div>
+        <div class="zone-row"><span>Annulus length</span><span class="zone-val" id="v-ann-len">—</span></div>
+        <div class="zone-row"><span>CasID − TubOD</span><span class="zone-val" id="v-ann-ids">—</span></div>
+        <div class="zone-row"><span>Annulus capacity</span><span class="zone-val" id="v-ann-cap">—</span></div>
+        <div class="zone-total">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">Z2 — Annulus fill</span>
+          <span class="zone-total-val" id="v-zone2">— bbls</span>
+        </div>
+      </div>
+
+      <!-- Zone 3: Open casing below EOT -->
+      <div class="zone-box">
+        <div class="zone-title" style="color:var(--pu);">Zone 3 — Open Casing Below EOT (EOT → Top Perf)</div>
+        <div class="zone-row"><span>Open casing length</span><span class="zone-val" id="v-oh-len">—</span></div>
+        <div class="zone-row"><span>Casing ID</span><span class="zone-val" id="v-cas-id">—</span></div>
+        <div class="zone-row"><span>Capacity factor</span><span class="zone-val" id="v-cas-cap">—</span></div>
+        <div class="zone-total">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">Z3 — Open casing fill</span>
+          <span class="zone-total-val" id="v-zone3">— bbls</span>
+        </div>
+      </div>
+
+      <!-- Grand Total -->
+      <div style="background:var(--surface);border:2px solid var(--gr);border-radius:4px;padding:12px;margin-top:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">TOTAL WELLBORE FILL (Z1+Z2+Z3)</span>
+          <span style="font-family:var(--mono);font-size:22px;color:var(--gr);font-weight:700;" id="v-total">— bbls</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">+ 10% Excess Recommended</span>
+          <span style="font-family:var(--mono);font-size:18px;color:var(--accent);" id="v-excess">— bbls</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:var(--mono);font-size:11px;color:var(--mt);">Total Volume to Prepare</span>
+          <span style="font-family:var(--mono);font-size:18px;color:var(--wn);" id="v-prepare">— bbls</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volume diagram -->
+    <div class="p">
+      <div class="pl">Volume Schematic</div>
+      <canvas id="volDiag" height="320" style="width:100%;"></canvas>
+      <div id="vol-legend" style="font-family:var(--mono);font-size:10px;color:var(--mt);
+        margin-top:8px;line-height:1.8;"></div>
+    </div>
+  </div>
+
+  <!-- STEP-BY-STEP -->
+  <div class="st">Step-by-Step Calculation Trace</div>
+  <div class="p">
+    <div class="pl">Full Calculation</div>
+    <table class="stbl">
+      <thead><tr><th>Step</th><th>Formula / Description</th><th>Value</th></tr></thead>
+      <tbody id="steps-body"></tbody>
+    </table>
+  </div>
+
+  <!-- TEMP CORRECTION DETAIL -->
+  <div class="st">Temperature Correction & Brine Reference</div>
+  <div class="g2">
+    <div class="p pp">
+      <div class="pl">Correction Detail</div>
+      <div id="temp-detail" style="font-family:var(--mono);font-size:11px;color:var(--mt);line-height:1.9;"></div>
+    </div>
+    <div class="p">
+      <div class="pl">MBA Field Brine System</div>
+      <table class="stbl">
+        <thead><tr><th>Brine</th><th>Range (ppg)</th><th>Corr. SG/°C</th></tr></thead>
+        <tbody>
+          <tr><td>KCl 3% wt</td><td>≤ 8.6</td><td>0.00036</td></tr>
+          <tr><td>NaCl</td><td>8.6 – 10.0</td><td>0.00045</td></tr>
+          <tr><td>Sodium Formate</td><td>10.0 – 10.8</td><td>0.00040</td></tr>
+          <tr><td>K₂CO₃</td><td>10.8 – 12.8</td><td>0.00036</td></tr>
+        </tbody>
+      </table>
+      <div class="al ai" style="margin-top:8px;font-size:10px;">
+        Safety overbalance = min(200 psi equiv., 0.8 ppg) at top perf TVDRT depth.
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESSURE CHART -->
+  <div class="st">Pressure Profile</div>
+  <div class="p">
+    <div class="pl">Depth vs Pressure</div>
+    <div style="position:relative;height:280px;">
+      <canvas id="pressChart"></canvas>
+    </div>
+    <div id="chart-legend" style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;
+      font-family:var(--mono);font-size:10px;color:var(--mt);"></div>
+  </div>
+
+</div><!-- /results-section -->
+
+<!-- FOOTER -->
+<div style="margin-top:28px;text-align:center;padding:14px;border-top:1px solid var(--border);">
+  <div style="font-family:var(--hd);font-size:18px;font-weight:900;color:var(--accent);">
+    KILL WEIGHT <span style="color:#fff;">BRINE</span> — MBA FIELD
+  </div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--mt);margin-top:4px;letter-spacing:.1em;">
+    © 2025 BALA · Petroleum Engineer · Wells Engineering · Vedanta–Cairn O&G
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const FD = {
+  A:{ name:'Aishwarya', owc:1157, owcPres:1900, tempGrad:3.4, gradType:'fixed', gradVal:1.17,  color:'#f59e0b' },
+  M:{ name:'Mangala',   owc:960,  owcPres:1620, tempGrad:3.7, gradType:'range', gradMin:1.16, gradMax:1.19, color:'#22c55e' },
+  B:{ name:'Bhagyam',   owc:448,  owcPres:892,  tempGrad:3.4, gradType:'range', gradMin:1.20, gradMax:1.28, color:'#a78bfa' },
+  C:{ name:'Custom',    owc:null, owcPres:null, tempGrad:null, gradType:'custom', color:'#38bdf8' }
+};
+
+// Standard casing ID table: size → ppf → ID (inches)
+// Source: API 5CT standard casing tables
+const CASING_PPF = {
+  '9625': {
+    label: '9⅝"',
+    weights: [
+      {ppf: 32.3, id: 9.001, grade: 'H40/J55'},
+      {ppf: 36,   id: 8.921, grade: 'J55/K55'},
+      {ppf: 40,   id: 8.835, grade: 'N80/L80'},
+      {ppf: 43.5, id: 8.755, grade: 'N80/P110'},
+      {ppf: 47,   id: 8.681, grade: 'N80/P110'},
+      {ppf: 53.5, id: 8.535, grade: 'P110'},
+    ]
+  },
+  '7': {
+    label: '7"',
+    weights: [
+      {ppf: 17,   id: 6.538, grade: 'J55'},
+      {ppf: 20,   id: 6.456, grade: 'J55/K55'},
+      {ppf: 23,   id: 6.366, grade: 'N80'},
+      {ppf: 26,   id: 6.276, grade: 'N80/L80'},
+      {ppf: 29,   id: 6.184, grade: 'N80/P110'},
+      {ppf: 32,   id: 6.094, grade: 'P110'},
+      {ppf: 35,   id: 6.004, grade: 'P110/Q125'},
+      {ppf: 38,   id: 5.920, grade: 'Q125'},
+    ]
+  },
+  'custom': { label: 'Custom', weights: [] }
+};
+
+const BRINES = [
+  { name:'KCl (3% wt)',    max:8.6,  color:'#22c55e', tempCorr:0.00036 },
+  { name:'NaCl',           max:10.0, color:'#38bdf8', tempCorr:0.00045 },
+  { name:'Sodium Formate', max:10.8, color:'#f59e0b', tempCorr:0.00040 },
+  { name:'K₂CO₃',         max:12.8, color:'#a78bfa', tempCorr:0.00036 },
+];
+
+function getBrine(ppg) {
+  for (const b of BRINES) if (ppg <= b.max) return b;
+  return { name:'> K₂CO₃ max (12.8 ppg)', color:'#ef4444', tempCorr:0.00036 };
+}
+
+// ══════════════════════════════════════
+// CONVERSIONS
+// ══════════════════════════════════════
+const mToFt   = v => v * 3.28084;
+const ppgToSg = p => p / 8.34051;
+const sgToPpg = s => s * 8.34051;
+// Volume: capacity factor for a pipe = (ID_in)² / 1029.4  → bbls/ft
+const capFactor = id_in => (id_in * id_in) / 1029.4;
+// Annulus capacity = (casing_ID² - tubing_OD²) / 1029.4 → bbls/ft
+const annFactor = (cid, tod) => ((cid*cid) - (tod*tod)) / 1029.4;
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let CF = 'A';
+let pressChartObj = null;
+
+// ══════════════════════════════════════
+// FIELD SELECTOR
+// ══════════════════════════════════════
+function SF(f) {
+  CF = f;
+  document.querySelectorAll('.ftab').forEach((b,i) => {
+    b.classList.remove('on');
+    if (['A','M','B','C'][i] === f) b.classList.add('on');
+  });
+  document.getElementById('fldSel').value = f;
+  applyField(f);
+}
+
+function applyField(f) {
+  const fd = FD[f];
+  const isC = f === 'C';
+  const owcEl = document.getElementById('owcTVD');
+  const tgEl  = document.getElementById('tempGrad');
+
+  if (!isC && fd.owc) {
+    owcEl.value = fd.owc;   owcEl.classList.add('locked');
+    tgEl.value  = fd.tempGrad; tgEl.classList.add('locked');
+    document.getElementById('owcPres').value = fd.owcPres;
+    document.getElementById('owcPres').classList.add('locked');
+    document.getElementById('owc-badge').style.display = 'inline';
+    document.getElementById('tg-badge').style.display  = 'inline';
+    document.getElementById('owcp-badge').style.display = 'inline';
+    document.getElementById('owc-hint').textContent  = `${fd.name} OWC = ${fd.owc} m TVDSS (fixed)`;
+    document.getElementById('tg-hint').textContent   = `${fd.name} = ${fd.tempGrad}°C/100m (fixed)`;
+    document.getElementById('owcp-hint').textContent = `${fd.name} OWC pressure = ${fd.owcPres} psi (fixed field datum)`;
+  } else {
+    owcEl.classList.remove('locked'); tgEl.classList.remove('locked');
+    document.getElementById('owcPres').classList.remove('locked');
+    if (isC) { owcEl.value = ''; tgEl.value = ''; document.getElementById('owcPres').value = ''; }
+    document.getElementById('owc-badge').style.display  = 'none';
+    document.getElementById('tg-badge').style.display   = 'none';
+    document.getElementById('owcp-badge').style.display = 'none';
+    document.getElementById('owc-hint').textContent  = 'Enter OWC for custom field';
+    document.getElementById('tg-hint').textContent   = 'Enter thermal gradient';
+    document.getElementById('owcp-hint').textContent = 'Enter known OWC pressure from RFT/PLT';
+  }
+
+  const fixedDiv  = document.getElementById('grad-fixed');
+  const rangeDiv  = document.getElementById('grad-range');
+  const customDiv = document.getElementById('grad-custom');
+  const pltNote   = document.getElementById('plt-note');
+  [fixedDiv, rangeDiv, customDiv].forEach(d => d.style.display = 'none');
+  pltNote.style.display = 'none';
+
+  if (fd.gradType === 'fixed') {
+    fixedDiv.style.display = 'block';
+    document.getElementById('gradFixed').value = fd.gradVal;
+    document.getElementById('grad-fixed-hint').textContent = `${fd.name} = ${fd.gradVal} psi/m (fixed)`;
+  } else if (fd.gradType === 'range') {
+    rangeDiv.style.display = 'block';
+    const sl = document.getElementById('gradSlider');
+    sl.min = fd.gradMin; sl.max = fd.gradMax;
+    const mid = +((fd.gradMin + fd.gradMax)/2).toFixed(3);
+    sl.value = mid;
+    document.getElementById('grad-min-lbl').textContent = fd.gradMin;
+    document.getElementById('grad-max-lbl').textContent = fd.gradMax;
+    document.getElementById('grad-range-lbl').textContent = `Fluid Gradient — ${fd.name} (psi/m)`;
+    document.getElementById('grad-range-hint').textContent = `Range: ${fd.gradMin}–${fd.gradMax} psi/m. Use PLT/RFT if available. Default = midpoint.`;
+    document.getElementById('grad-cur').textContent = mid + ' psi/m';
+    pltNote.style.display = 'block';
+    pltNote.textContent = `PLT/RFT preferred. If unavailable use midpoint (${mid} psi/m). Slide to adjust.`;
+  } else {
+    customDiv.style.display = 'block';
+  }
+  updateRTElev();
+  updateConversions();
+}
+
+function onSlider() {
+  const v = parseFloat(document.getElementById('gradSlider').value).toFixed(3);
+  document.getElementById('grad-cur').textContent = v + ' psi/m';
+}
+
+function getGradient() {
+  const fd = FD[CF];
+  if (fd.gradType === 'fixed')  return parseFloat(document.getElementById('gradFixed').value) || 0;
+  if (fd.gradType === 'range')  return parseFloat(document.getElementById('gradSlider').value) || 0;
+  if (fd.gradType === 'custom') return parseFloat(document.getElementById('gradCustom').value) || 0;
+  return 0;
+}
+
+// ══════════════════════════════════════
+// CASING PPF SELECTOR
+// ══════════════════════════════════════
+function onCasingSelect() {
+  const sel = document.getElementById('casingConfig').value;
+  const ppfSel = document.getElementById('casingPPF');
+  const cidEl  = document.getElementById('casingID');
+  const badge  = document.getElementById('cid-badge');
+  const ppfRow = document.getElementById('ppf-row');
+
+  if (sel === 'custom') {
+    ppfRow.style.display = 'none';
+    cidEl.classList.remove('locked');
+    cidEl.value = '';
+    badge.style.display = 'none';
+    document.getElementById('cid-hint').textContent = 'Enter custom casing ID';
+    document.getElementById('ppf-hint').textContent = '';
+    return;
+  }
+  ppfRow.style.display = 'block';
+  const data = CASING_PPF[sel];
+  ppfSel.innerHTML = '<option value="">-- Select weight (lb/ft) --</option>' +
+    data.weights.map(w =>
+      `<option value="${w.ppf}">${w.ppf} lb/ft — ID ${w.id}" (${w.grade})</option>`
+    ).join('');
+  cidEl.value = '';
+  cidEl.classList.add('locked');
+  badge.textContent = 'AUTO';
+  badge.style.display = 'inline';
+  document.getElementById('cid-hint').textContent = `Select ${data.label} weight above to auto-fill ID`;
+}
+
+function onPPFSelect() {
+  const sel   = document.getElementById('casingConfig').value;
+  const ppf   = parseFloat(document.getElementById('casingPPF').value);
+  const cidEl = document.getElementById('casingID');
+  if (isNaN(ppf) || sel === 'custom') return;
+  const data  = CASING_PPF[sel];
+  const match = data.weights.find(w => w.ppf === ppf);
+  if (match) {
+    cidEl.value = match.id;
+    document.getElementById('cid-hint').textContent =
+      `${data.label} · ${match.ppf} lb/ft · Grade ${match.grade} · ID = ${match.id}"`;
+    document.getElementById('ppf-hint').textContent =
+      `API 5CT: ${data.label} ${match.ppf} lb/ft — drift ID ≈ ${(match.id - 0.125).toFixed(3)}"`;
+  }
+}
+
+// ══════════════════════════════════════
+// LIVE ELEVATION + CONVERSION DISPLAY
+// All inputs are now TVDRT
+// TVDSS = TVDRT - rtElev
+// OWC is stored in TVDSS, convert to TVDRT for comparison
+// ══════════════════════════════════════
+function updateRTElev() {
+  const ge = parseFloat(document.getElementById('groundElev').value);
+  const rh = parseFloat(document.getElementById('rigHeight').value);
+  const el   = document.getElementById('rt-elev-disp');
+  const note = document.getElementById('rt-elev-note');
+  if (!isNaN(ge) && !isNaN(rh)) {
+    const total = ge + rh;
+    el.textContent = total.toFixed(1) + ' m';
+    note.textContent = `${ge}m ground + ${rh}m rig = ${total.toFixed(1)}m above MSL`;
+  } else {
+    el.textContent = '—';
+    note.textContent = 'Enter ground elevation and rig height';
+  }
+  updateConversions();
+}
+
+function updateConversions() {
+  const ge = parseFloat(document.getElementById('groundElev').value) || 0;
+  const rh = parseFloat(document.getElementById('rigHeight').value) || 0;
+  const rtElev = ge + rh;
+
+  // Inputs are TVDRT → convert to TVDSS for display
+  const tp_rt  = parseFloat(document.getElementById('topPerfTVD').value);
+  const eot_rt = parseFloat(document.getElementById('eotTVD').value);
+  const owc_ss = parseFloat(document.getElementById('owcTVD').value); // OWC is TVDSS
+
+  // TVDSS = TVDRT - rtElev
+  document.getElementById('tp-tvdss-disp').textContent =
+    !isNaN(tp_rt)  ? (tp_rt  - rtElev).toFixed(1) + ' m' : '—';
+  document.getElementById('eot-tvdss-disp').textContent =
+    !isNaN(eot_rt) ? (eot_rt - rtElev).toFixed(1) + ' m' : '—';
+  // OWC TVDRT = OWC TVDSS + rtElev
+  document.getElementById('owc-tvdrt-disp').textContent =
+    !isNaN(owc_ss) ? (owc_ss + rtElev).toFixed(1) + ' m' : '—';
+
+  document.getElementById('tvdrt-formula').textContent =
+    rtElev > 0
+      ? `TVDSS = TVDRT − ${rtElev.toFixed(1)}m RT elev | OWC TVDRT = TVDSS + ${rtElev.toFixed(1)}m`
+      : 'Enter RT elevation above to see conversions';
+
+  // Update depth hints
+  if (!isNaN(tp_rt) && rtElev > 0)
+    document.getElementById('tp-tvdss-hint').textContent =
+      `= ${(tp_rt - rtElev).toFixed(1)}m TVDSS`;
+  if (!isNaN(eot_rt) && rtElev > 0)
+    document.getElementById('eot-tvdss-hint').textContent =
+      `= ${(eot_rt - rtElev).toFixed(1)}m TVDSS`;
+
+  drawDepthDiagram();
+}
+
+// ══════════════════════════════════════
+// DEPTH DIAGRAM (schematic)
+// ══════════════════════════════════════
+function drawDepthDiagram() {
+  const canvas = document.getElementById('depthDiag');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 300;
+  canvas.height = 220;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const ge = parseFloat(document.getElementById('groundElev').value) || 0;
+  const rh = parseFloat(document.getElementById('rigHeight').value) || 0;
+  const rtElev = ge + rh;
+  // Inputs are now TVDRT directly
+  const tp_rt  = parseFloat(document.getElementById('topPerfTVD').value);
+  const et_rt  = parseFloat(document.getElementById('eotTVD').value);
+  const owc_ss = parseFloat(document.getElementById('owcTVD').value);
+  const owc_rt = !isNaN(owc_ss) ? owc_ss + rtElev : NaN; // OWC TVDSS → TVDRT
+
+  const W = canvas.width, H = canvas.height;
+  const margin = { top:24, bottom:20, left:60, right:20 };
+  const drawH = H - margin.top - margin.bottom;
+  const drawW = W - margin.left - margin.right;
+
+  // Max depth in TVDRT
+  const depths = [tp_rt, et_rt, owc_rt].filter(d => !isNaN(d));
+  if (depths.length === 0) {
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px Share Tech Mono';
+    ctx.textAlign = 'center';
+    ctx.fillText('Enter depths to see schematic', W/2, H/2);
+    return;
+  }
+  const maxD = Math.max(...depths) * 1.12;
+  const minD = Math.max(0, rtElev * 0.8);
+  const range = maxD - minD;
+  const toY = d => margin.top + ((d - minD) / range) * drawH;
+  const cx = margin.left + drawW / 2;
+
+  // RT line (top = 0 TVDRT)
+  const rtY = toY(rtElev);
+  ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(margin.left, rtY); ctx.lineTo(W-margin.right, rtY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#f59e0b'; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'left';
+  ctx.fillText(`RT (${rtElev.toFixed(1)}m TVDRT)`, margin.left+2, rtY-3);
+
+  // MSL line
+  if (rtElev > 0) {
+    const mslY = toY(rtElev);
+    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 0.5; ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(margin.left, mslY); ctx.lineTo(W-margin.right, mslY); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Casing walls
+  const casingW = 14;
+  ctx.fillStyle = '#1e2e40'; ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1;
+  const casingTopY = toY(rtElev);
+  const casingBotY = toY(maxD);
+  ctx.fillRect(cx - casingW - 4, casingTopY, casingW, casingBotY - casingTopY);
+  ctx.strokeRect(cx - casingW - 4, casingTopY, casingW, casingBotY - casingTopY);
+  ctx.fillRect(cx + 4, casingTopY, casingW, casingBotY - casingTopY);
+  ctx.strokeRect(cx + 4, casingTopY, casingW, casingBotY - casingTopY);
+
+  // Tubing (EOT is TVDRT input)
+  if (!isNaN(et_rt)) {
+    const eotY = toY(et_rt);
+    const tubW = 7;
+    ctx.fillStyle = '#131d28'; ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5;
+    ctx.fillRect(cx - tubW, casingTopY, tubW, eotY - casingTopY);
+    ctx.strokeRect(cx - tubW, casingTopY, tubW, eotY - casingTopY);
+    ctx.fillRect(cx, casingTopY, tubW, eotY - casingTopY);
+    ctx.strokeRect(cx, casingTopY, tubW, eotY - casingTopY);
+    ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(cx - tubW - 2, eotY); ctx.lineTo(cx + tubW + 2, eotY); ctx.stroke();
+    ctx.fillStyle = '#f59e0b'; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'right';
+    ctx.fillText(`EOT ${et_rt}m RT`, cx - tubW - 4, eotY + 3);
+  }
+
+  // Top Perf (TVDRT input)
+  if (!isNaN(tp_rt)) {
+    const tpY = toY(tp_rt);
+    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5; ctx.setLineDash([3,2]);
+    ctx.beginPath(); ctx.moveTo(margin.left, tpY); ctx.lineTo(W - margin.right, tpY); ctx.stroke();
+    ctx.setLineDash([]);
+    for (let i = 0; i < 4; i++) {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(cx - casingW - 4 + (i%2)*5, tpY + (i < 2 ? 5 : 11), 2, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.fillStyle = '#ef4444'; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'left';
+    ctx.fillText(`Top Perf ${tp_rt}m RT`, cx + casingW + 8, tpY + 4);
+  }
+
+  // OWC (convert TVDSS → TVDRT for display)
+  if (!isNaN(owc_rt)) {
+    const owcY = toY(owc_rt);
+    if (owcY > margin.top && owcY < H - margin.bottom) {
+      ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 1; ctx.setLineDash([4,2]);
+      ctx.beginPath(); ctx.moveTo(margin.left, owcY); ctx.lineTo(W - margin.right, owcY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#22c55e'; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'left';
+      ctx.fillText(`OWC ${owc_ss}m SS`, cx + casingW + 8, owcY - 3);
+    }
+  }
+
+  // Zone labels
+  if (!isNaN(et_rt) && !isNaN(tp_rt)) {
+    const eotY = toY(et_rt), tpY = toY(tp_rt);
+    ctx.fillStyle = '#38bdf8'; ctx.font = '8px Share Tech Mono'; ctx.textAlign = 'center';
+    ctx.fillText('Z1', cx, (casingTopY + eotY) / 2);
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText('Z2', cx, (eotY + tpY) / 2);
+  }
+
+  // Depth axis
+  ctx.fillStyle = '#64748b'; ctx.font = '9px Share Tech Mono'; ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const d = minD + (range / 4) * i;
+    const y = toY(d);
+    if (y > margin.top && y < H - margin.bottom)
+      ctx.fillText(d.toFixed(0)+'m', margin.left - 4, y + 3);
+  }
+}
+
+// ══════════════════════════════════════
+// MAIN CALCULATE
+// ══════════════════════════════════════
+function CALC() {
+  const ge = parseFloat(document.getElementById('groundElev').value);
+  const rh = parseFloat(document.getElementById('rigHeight').value);
+  const owcTVDSS  = parseFloat(document.getElementById('owcTVD').value);
+  const owcPres   = parseFloat(document.getElementById('owcPres').value);   // KNOWN pressure at OWC
+  const tempGrad  = parseFloat(document.getElementById('tempGrad').value);
+  const surfTemp  = parseFloat(document.getElementById('surfTemp').value) || 25;
+  const topPerf_RT = parseFloat(document.getElementById('topPerfTVD').value); // TVDRT input
+  const eot_RT     = parseFloat(document.getElementById('eotTVD').value);     // TVDRT input
+  const tubTop_RT  = parseFloat(document.getElementById('tubTop').value);     // TVDRT input
+  const depletion = parseFloat(document.getElementById('depletion').value) || 0;
+  const currBrine = parseFloat(document.getElementById('currBrine').value);
+  const fluidGrad = getGradient();
+  const casingID  = parseFloat(document.getElementById('casingID').value);
+  const tubOD     = parseFloat(document.getElementById('tubOD').value);
+  const tubID     = parseFloat(document.getElementById('tubID').value);
+  const fd = FD[CF];
+
+  // Validate
+  const missing = [];
+  if (isNaN(ge))         missing.push('Ground Elevation');
+  if (isNaN(rh))         missing.push('Rig Height');
+  if (isNaN(owcTVDSS))   missing.push('OWC TVD');
+  if (isNaN(owcPres))    missing.push('Pressure at OWC (psi)');
+  if (isNaN(tempGrad))   missing.push('Thermal Gradient');
+  if (isNaN(topPerf_RT)) missing.push('Top Perforation TVDRT');
+  if (isNaN(eot_RT))     missing.push('End of Tubing String TVDRT');
+  if (!fluidGrad)        missing.push('Fluid Gradient');
+  if (isNaN(casingID))   missing.push('Casing ID (select casing size + weight)');
+  if (isNaN(tubID))      missing.push('Tubing ID');
+
+  if (missing.length > 0) {
+    alert('Please fill in:\n• ' + missing.join('\n• '));
+    return;
+  }
+
+  // ── ELEVATION
+  const rtElev = ge + rh;
+
+  // ── DEPTH CONVERSIONS
+  // ── DEPTH REFERENCES — critical to keep these separate
+  // TVDSS = depth below Mean Sea Level → used for reservoir pressure (fluid column in reservoir)
+  // TVDRT = depth below Rotary Table   → used for KWB (brine column from surface to perf)
+  //
+  // Inputs are TVDRT. Convert to TVDSS by subtracting RT elevation.
+  const owcTVDSS_m    = owcTVDSS;                    // already TVDSS (fixed field value)
+  const topPerf_TVDSS = topPerf_RT - rtElev;          // TVDRT input → TVDSS
+  const topPerfRT_m   = topPerf_RT;                   // TVDRT — for brine column height
+  const eotRT_m       = eot_RT;
+  const tubTopRT_m    = !isNaN(tubTop_RT) ? tubTop_RT : rtElev;
+
+  // ── PRESSURE CALCULATION — all in TVDSS (MSL reference)
+  // P_owc is KNOWN from field RFT/PLT data — NOT calculated from gradient
+  // Gradient is used ONLY for the column between OWC and top perf
+  const P_owc      = owcPres;                                 // known field datum
+  const colSS      = owcTVDSS_m - topPerf_TVDSS;             // column in TVDSS metres
+  const P_top_perf = P_owc - (fluidGrad * colSS);             // gradient × column only
+  const P_res      = P_top_perf + depletion;
+
+  // ── BHT — thermal gradient measured from surface ground, use TVDSS
+  const BHT    = surfTemp + (tempGrad * Math.max(0, topPerf_TVDSS) / 100);
+  const deltaT = BHT - surfTemp;
+
+  // ── KWB BACK-CALCULATION — use TVDRT (brine column starts at RT, 170m above MSL)
+  // The brine column height = TVDRT of top perf (distance from RT down to perf)
+  // KWB (ppg) = P_res / (0.1704 × topPerf_TVDRT_m)
+  // where 0.1704 = 0.052 × 3.28084 (converts metres to ft for ppg formula)
+  const KWB_dh    = P_res / (0.1704 * topPerfRT_m);
+  const KWB_dh_sg = ppgToSg(KWB_dh);
+
+  // ── ROUGH SURFACE KWB (to pick brine type)
+  const roughSurf = KWB_dh + (deltaT * 0.0004 * 8.34051) + 0.8;
+  const brine = getBrine(roughSurf);
+
+  // ── TEMP CORRECTION
+  const deltaSG      = deltaT * brine.tempCorr;
+  const KWB_surf_sg  = KWB_dh_sg + deltaSG;
+  const KWB_surf_ppg = sgToPpg(KWB_surf_sg);
+
+  // ── SAFETY OVERBALANCE — whichever is LESS: 200 psi equiv OR 0.8 ppg
+  // 200 psi equiv uses TVDRT (brine column reference same as KWB)
+  const ob_200_ppg = 200 / (0.1704 * topPerfRT_m);
+  const ob_0p8_ppg = 0.8;
+  let ob_ppg, ob_note;
+  if (ob_200_ppg <= ob_0p8_ppg) {
+    ob_ppg  = +ob_200_ppg.toFixed(4);
+    ob_note = `200 psi equiv at ${topPerfRT_m.toFixed(1)}m TVDRT = ${ob_200_ppg.toFixed(3)} ppg → LESS than 0.8 ppg → using 200 psi`;
+  } else {
+    ob_ppg  = ob_0p8_ppg;
+    ob_note = `0.8 ppg < 200 psi equiv (${ob_200_ppg.toFixed(3)} ppg) at this depth → LESS → using 0.8 ppg`;
+  }
+
+  // ── FINAL KWB
+  const KWB_final    = KWB_surf_ppg + ob_ppg;
+  const KWB_final_sg = ppgToSg(KWB_final);
+  const finalBrine   = getBrine(KWB_final);
+
+  // ══════════════════════════════════════
+  // VOLUME CALCULATION — 3 ZONES
+  // Wellbore fill volume (down tubing + up annulus + open casing below EOT)
+  //
+  // Zone 1: Tubing top → EOT  — INSIDE tubing (tubing ID²/1029.4 × length)
+  // Zone 2: Tubing top → EOT  — ANNULUS alongside tubing ((casID²−tubOD²)/1029.4 × length)
+  // Zone 3: EOT → Top Perf   — Open casing, no tubing (casID²/1029.4 × length)
+  //
+  // Total wellbore fill = Z1 + Z2 + Z3
+  // ══════════════════════════════════════
+  const tub_len_m  = Math.max(0, eotRT_m - tubTopRT_m);
+  const tub_len_ft = mToFt(tub_len_m);
+
+  // Z1 — tubing inside capacity
+  const z1_cap = capFactor(tubID);          // bbls/ft
+  const z1_vol = z1_cap * tub_len_ft;
+
+  // Z2 — annulus alongside tubing (casing ID² - tubing OD²)
+  const z2_cap = annFactor(casingID, tubOD); // bbls/ft  = (casID²−tubOD²)/1029.4
+  const z2_vol = z2_cap * tub_len_ft;
+
+  // Z3 — open casing below EOT to top perf (no tubing present)
+  const z3_len_m  = Math.max(0, topPerfRT_m - eotRT_m);
+  const z3_len_ft = mToFt(z3_len_m);
+  const z3_cap    = capFactor(casingID);     // bbls/ft
+  const z3_vol    = z3_cap * z3_len_ft;
+
+  const totalVol   = z1_vol + z2_vol + z3_vol;
+  const excessVol  = totalVol * 0.10;
+  const prepareVol = totalVol + excessVol;
+
+  // ══════════════════════════════════════
+  // UPDATE DOM
+  // ══════════════════════════════════════
+  document.getElementById('results-section').style.display = 'block';
+
+  // Pressures
+  document.getElementById('r-owc').innerHTML  = `${P_owc.toFixed(1)}<span class="ru">psi</span>`;
+  document.getElementById('r-owc-f').textContent =
+    `Known field datum at OWC ${owcTVDSS_m}m TVDSS`;
+  document.getElementById('r-perf').innerHTML = `${P_top_perf.toFixed(1)}<span class="ru">psi</span>`;
+  document.getElementById('r-perf-f').textContent =
+    `${P_owc.toFixed(1)} − (${fluidGrad} × ${colSS.toFixed(1)}m TVDSS col)`;
+  document.getElementById('r-res').innerHTML  = `${P_res.toFixed(1)}<span class="ru">psi</span>`;
+  document.getElementById('r-dep-note').textContent =
+    depletion < 0 ? `Depleted ${Math.abs(depletion)} psi` :
+    depletion > 0 ? `Overpressured +${depletion} psi` : 'No correction applied';
+
+  // Temp & Brine
+  document.getElementById('r-bht').innerHTML  = `${BHT.toFixed(1)}<span class="ru">°C</span>`;
+  document.getElementById('r-bht-f').textContent =
+    `25 + (${tempGrad} × ${Math.max(0,topPerf_TVDSS).toFixed(0)}m / 100)`;
+  document.getElementById('r-brine-badge').innerHTML =
+    `<div class="brine-badge" style="border-color:${finalBrine.color};color:${finalBrine.color};">
+      ${finalBrine.name}
+    </div>`;
+  document.getElementById('r-brine-note').textContent = `Temp corr: ${finalBrine.tempCorr} SG/°C`;
+
+  // KWB
+  document.getElementById('r-kwb-dh').innerHTML = `${KWB_dh.toFixed(3)}<span class="ru">ppg</span>`;
+  document.getElementById('r-kwb-dh-f').textContent =
+    `${P_res.toFixed(1)} ÷ (0.1704 × ${topPerfRT_m.toFixed(1)}m TVDRT)`;
+  document.getElementById('r-tcorr').textContent =
+    `+${deltaSG.toFixed(4)} SG (${deltaT.toFixed(1)}°C × ${finalBrine.tempCorr})`;
+  document.getElementById('r-ob-used').textContent = `+${ob_ppg.toFixed(3)} ppg`;
+  document.getElementById('r-ob-note').textContent = ob_note;
+
+  document.getElementById('r-kwb-surf').innerHTML =
+    `${KWB_surf_ppg.toFixed(3)}<span class="ru">ppg</span>`;
+  document.getElementById('r-kwb-final').innerHTML =
+    `${KWB_final.toFixed(3)}<span style="font-size:11px;color:var(--mt);"> ppg</span>`;
+  document.getElementById('r-kwb-sg').textContent = `${KWB_final_sg.toFixed(4)} SG`;
+
+  // Volumes — 3 zones
+  document.getElementById('v-tub-len').textContent  = `${tub_len_m.toFixed(1)} m (${tub_len_ft.toFixed(0)} ft)`;
+  document.getElementById('v-tub-id').textContent   = `${tubID}" ID`;
+  document.getElementById('v-tub-cap').textContent  = `${z1_cap.toFixed(5)} bbls/ft`;
+  document.getElementById('v-zone1').textContent    = `${z1_vol.toFixed(3)} bbls`;
+
+  document.getElementById('v-ann-len').textContent  = `${tub_len_m.toFixed(1)} m (${tub_len_ft.toFixed(0)} ft)`;
+  document.getElementById('v-ann-ids').textContent  = `CasID ${casingID}" − TubOD ${tubOD}"`;
+  document.getElementById('v-ann-cap').textContent  = `${z2_cap.toFixed(5)} bbls/ft`;
+  document.getElementById('v-zone2').textContent    = `${z2_vol.toFixed(3)} bbls`;
+
+  document.getElementById('v-oh-len').textContent   = `${z3_len_m.toFixed(1)} m (${z3_len_ft.toFixed(0)} ft)`;
+  document.getElementById('v-cas-id').textContent   = `${casingID}" ID`;
+  document.getElementById('v-cas-cap').textContent  = `${z3_cap.toFixed(5)} bbls/ft`;
+  document.getElementById('v-zone3').textContent    = `${z3_vol.toFixed(3)} bbls`;
+
+  document.getElementById('v-total').textContent    = `${totalVol.toFixed(3)} bbls`;
+  document.getElementById('v-excess').textContent   = `${excessVol.toFixed(3)} bbls`;
+  document.getElementById('v-prepare').textContent  = `${prepareVol.toFixed(3)} bbls`;
+
+  // Alerts
+  const alerts = [];
+  if (!isNaN(currBrine)) {
+    const diff = currBrine - KWB_final;
+    if (diff >= 0)
+      alerts.push({c:'aok', t:`✓ Current brine ${currBrine} ppg is ${diff.toFixed(3)} ppg above KWB+OB (${KWB_final.toFixed(3)} ppg) — overbalanced.`});
+    else
+      alerts.push({c:'ae',  t:`⚠ Current brine ${currBrine} ppg is ${Math.abs(diff).toFixed(3)} ppg BELOW required ${KWB_final.toFixed(3)} ppg — UNDERBALANCED. Do not proceed.`});
+  }
+  if (eotRT_m >= topPerfRT_m)
+    alerts.push({c:'ae', t:`⚠ EOT (${eotRT_m}m TVDRT) is at or below top perf (${topPerfRT_m}m TVDRT). EOT must be ABOVE top perf.`});
+  if (owcTVDSS < (topPerf_RT - rtElev))
+    alerts.push({c:'ae', t:`⚠ OWC (${owcTVDSS}m TVDSS) is shallower than top perf (${(topPerf_RT-rtElev).toFixed(1)}m TVDSS). Check depths — perfs should be above OWC.`});
+  if (KWB_final > 12.8)
+    alerts.push({c:'ae', t:`KWB ${KWB_final.toFixed(2)} ppg exceeds K₂CO₃ maximum (12.8 ppg). Consult completion fluid engineer.`});
+  if (KWB_final > 10.8 && KWB_final <= 12.8)
+    alerts.push({c:'ap', t:`K₂CO₃ required. Verify tubular and elastomer compatibility.`});
+  if (KWB_final > 10.0 && KWB_final <= 10.8)
+    alerts.push({c:'ai', t:`Sodium Formate required. pH > 9.5 — verify elastomer compatibility.`});
+  if (depletion < -500)
+    alerts.push({c:'aw', t:`High depletion (${Math.abs(depletion)} psi) — confirm with latest RFT/PLT data.`});
+  alerts.push({c:'ai', t:`Gradient: ${fluidGrad} psi/m · OWC: ${owcTVDSS_m}m TVDSS · P_owc: ${owcPres} psi (datum) · Top perf: ${topPerf_TVDSS.toFixed(1)}m TVDSS = ${topPerfRT_m}m TVDRT · RT elev: ${rtElev.toFixed(1)}m`});
+
+  document.getElementById('status-div').innerHTML =
+    alerts.map(a => `<div class="al ${a.c}" style="margin-bottom:5px;">${a.t}</div>`).join('');
+
+  // Steps
+  const steps = [
+    ['1',  'RT elevation = ground + rig height',
+            `${ge}m + ${rh}m = ${rtElev.toFixed(1)}m above MSL`],
+    ['2',  'Top perf TVDSS = TVDRT input − RT elevation',
+            `${topPerfRT_m}m − ${rtElev.toFixed(1)} = ${topPerf_TVDSS.toFixed(1)}m TVDSS`],
+    ['3',  'P at OWC — KNOWN field datum (RFT/PLT), not calculated',
+            `${owcPres} psi at OWC ${owcTVDSS_m}m TVDSS`],
+    ['4',  'TVDSS column = OWC TVDSS − Top Perf TVDSS',
+            `${owcTVDSS_m.toFixed(1)} − ${topPerf_TVDSS.toFixed(1)} = ${colSS.toFixed(1)} m`],
+    ['5',  'P at top perf = P_owc − (gradient × TVDSS column)',
+            `${P_owc.toFixed(2)} − (${fluidGrad}×${colSS.toFixed(1)}) = ${P_top_perf.toFixed(2)} psi`],
+    ['6',  `Depletion/OP correction (${depletion >= 0?'+':''}${depletion} psi)`,
+            `P_res = ${P_res.toFixed(2)} psi`],
+    ['7',  'BHT = 25 + (thermal grad × TopPerf TVDSS / 100)',
+            `25 + (${tempGrad}×${Math.max(0,topPerf_TVDSS).toFixed(0)}/100) = ${BHT.toFixed(2)}°C`],
+    ['8',  'KWB = P_res ÷ (0.1704 × TopPerf TVDRT)  ← brine column from RT to perf',
+            `${P_res.toFixed(2)} ÷ (0.1704×${topPerfRT_m.toFixed(1)}) = ${KWB_dh.toFixed(4)} ppg`],
+    ['10', `Brine: ${finalBrine.name} | ΔSG = ${deltaT.toFixed(1)}°C × ${finalBrine.tempCorr}`,
+            `+${deltaSG.toFixed(5)} SG → surface KWB = ${KWB_surf_ppg.toFixed(4)} ppg`],
+    ['11', `Safety OB: min(200 psi=${ob_200_ppg.toFixed(3)} ppg, 0.8 ppg) = ${ob_ppg.toFixed(3)} ppg`,
+            ob_note],
+    ['12', 'Final KWB = surface KWB + safety OB',
+            `${KWB_surf_ppg.toFixed(4)} + ${ob_ppg.toFixed(3)} = ${KWB_final.toFixed(4)} ppg`],
+    ['13', `Zone 1 — Tubing inside = (TubID²/1029.4) × tub_len_ft`,
+            `(${tubID}²/1029.4) × ${tub_len_ft.toFixed(0)} ft = ${z1_vol.toFixed(3)} bbls`],
+    ['14', `Zone 2 — Annulus = ((CasID²−TubOD²)/1029.4) × tub_len_ft`,
+            `((${casingID}²−${tubOD}²)/1029.4) × ${tub_len_ft.toFixed(0)} ft = ${z2_vol.toFixed(3)} bbls`],
+    ['15', `Zone 3 — Open casing below EOT = (CasID²/1029.4) × open_len_ft`,
+            `(${casingID}²/1029.4) × ${z3_len_ft.toFixed(0)} ft = ${z3_vol.toFixed(3)} bbls`],
+    ['16', 'Total wellbore fill + 10% excess',
+            `${z1_vol.toFixed(3)} + ${z2_vol.toFixed(3)} + ${z3_vol.toFixed(3)} + ${excessVol.toFixed(3)} = ${prepareVol.toFixed(3)} bbls`],
+  ];
+  document.getElementById('steps-body').innerHTML = steps.map((s,i) =>
+    `<tr class="${i>=12?'final':''}${i===11?' hi':''}">
+      <td>Step ${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td>
+    </tr>`).join('');
+
+  // Temp detail
+  document.getElementById('temp-detail').innerHTML =
+`PRESSURE REFERENCE (TVDSS — from MSL):
+  OWC: ${owcTVDSS_m}m TVDSS | Known P_owc = ${owcPres} psi (field datum)
+  Top perf: ${topPerf_TVDSS.toFixed(1)}m TVDSS
+  P_top_perf = ${P_top_perf.toFixed(2)} psi | P_res = ${P_res.toFixed(2)} psi
+
+KWB REFERENCE (TVDRT — from Rotary Table):
+  Top perf TVDRT: ${topPerfRT_m}m (= TVDSS + ${rtElev.toFixed(1)}m RT elev)
+  Brine column from RT to perf = ${topPerfRT_m}m
+  KWB downhole = ${P_res.toFixed(2)} / (0.1704 × ${topPerfRT_m}) = ${KWB_dh.toFixed(4)} ppg
+
+TEMPERATURE:
+  BHT: 25 + (${tempGrad} × ${Math.max(0,topPerf_TVDSS).toFixed(0)}/100) = ${BHT.toFixed(2)}°C
+  Brine: ${finalBrine.name} | ΔT: ${deltaT.toFixed(1)}°C | ΔSG: +${deltaSG.toFixed(5)}
+
+FINAL:
+  Surface KWB:  ${KWB_surf_ppg.toFixed(4)} ppg
+  Safety OB:    +${ob_ppg.toFixed(3)} ppg [${ob_ppg===ob_0p8_ppg?'0.8 ppg was less':'200 psi equiv was less'}]
+  Final KWB:    ${KWB_final.toFixed(4)} ppg (${KWB_final_sg.toFixed(5)} SG)`;
+
+  // Charts
+  drawVolDiagram(z1_vol, z2_vol, z3_vol, tub_len_m, z3_len_m, tubID, tubOD, casingID);
+  drawPressChart(owcTVDSS_m, topPerf_TVDSS, topPerfRT_m, P_owc, P_top_perf, P_res, KWB_final, fluidGrad, rtElev);
+
+  // Print subtitle
+  document.getElementById('ph-sub').textContent =
+    `${fd.name||'Custom'} · ${document.getElementById('wellName').value||'Well'} · ` +
+    `${document.getElementById('jobDate').value||''} · ${document.getElementById('engName').value||'Bal Krishna'}`;
+
+  window.scrollTo({top: document.getElementById('results-section').offsetTop - 20, behavior:'smooth'});
+}
+
+
+// ══════════════════════════════════════
+// VOLUME DIAGRAM
+// ══════════════════════════════════════
+function drawVolDiagram(z1, z2, z3, tubLenM, openLenM, tubID, tubOD, casID) {
+  const canvas = document.getElementById('volDiag');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 300;
+  canvas.height = 320;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W = canvas.width, H = canvas.height;
+  const total = z1 + z2 + z3;
+  if (total <= 0) return;
+
+  // Heights proportional to volume
+  const usableH = H - 80;
+  const z1H = (z1/total) * usableH;
+  const z2H = (z2/total) * usableH;
+  const z3H = (z3/total) * usableH;
+
+  const cx = W/2, bw = 52;
+
+  // Zone 1 — tubing inside (blue)
+  const y1 = 20;
+  ctx.fillStyle='rgba(56,189,248,.18)'; ctx.strokeStyle='#38bdf8'; ctx.lineWidth=1.5;
+  ctx.fillRect(cx-bw/2, y1, bw, z1H); ctx.strokeRect(cx-bw/2, y1, bw, z1H);
+  ctx.fillStyle='#38bdf8'; ctx.font='bold 10px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText('Z1 TUBING', cx, y1+z1H/2-5);
+  ctx.fillText(`${z1.toFixed(3)} bbls`, cx, y1+z1H/2+8);
+  ctx.font='9px Share Tech Mono'; ctx.fillStyle='#64748b';
+  ctx.fillText(`${tubLenM.toFixed(0)}m · ID ${tubID}"`, cx, y1+z1H/2+20);
+
+  // Zone 2 — annulus (amber) — same height as Z1 since same length
+  const y2 = 20;
+  const ax = cx + bw/2 + 10;
+  ctx.fillStyle='rgba(245,158,11,.18)'; ctx.strokeStyle='#f59e0b'; ctx.lineWidth=1.5;
+  ctx.fillRect(ax, y2, bw, z2H); ctx.strokeRect(ax, y2, bw, z2H);
+  ctx.fillStyle='#f59e0b'; ctx.font='bold 10px Share Tech Mono';
+  ctx.fillText('Z2 ANNLS', ax+bw/2, y2+z2H/2-5);
+  ctx.fillText(`${z2.toFixed(3)} bbls`, ax+bw/2, y2+z2H/2+8);
+  ctx.font='9px Share Tech Mono'; ctx.fillStyle='#64748b';
+  ctx.fillText(`${tubLenM.toFixed(0)}m`, ax+bw/2, y2+z2H/2+20);
+
+  // Zone 3 — open casing (purple) below Z1
+  const y3 = 20 + Math.max(z1H, z2H);
+  ctx.fillStyle='rgba(167,139,250,.18)'; ctx.strokeStyle='#a78bfa'; ctx.lineWidth=1.5;
+  ctx.fillRect(cx-bw/2, y3, bw, z3H); ctx.strokeRect(cx-bw/2, y3, bw, z3H);
+  ctx.fillStyle='#a78bfa'; ctx.font='bold 10px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText('Z3 OPEN CAS', cx, y3+z3H/2-5);
+  ctx.fillText(`${z3.toFixed(3)} bbls`, cx, y3+z3H/2+8);
+  ctx.font='9px Share Tech Mono'; ctx.fillStyle='#64748b';
+  ctx.fillText(`${openLenM.toFixed(0)}m · ID ${casID}"`, cx, y3+z3H/2+20);
+
+  // Bracket line from Z1+Z2 bottom
+  const bracketY = y3;
+  ctx.strokeStyle='#374151'; ctx.lineWidth=0.5;
+  ctx.beginPath(); ctx.moveTo(cx-bw/2-2, y2); ctx.lineTo(cx-bw/2-2, bracketY); ctx.stroke();
+
+  // Total label
+  const totY = y3 + z3H + 16;
+  ctx.fillStyle='#22c55e'; ctx.font='bold 12px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText(`Total: ${total.toFixed(3)} bbls`, W/2, totY);
+  ctx.fillStyle='#f59e0b'; ctx.font='11px Share Tech Mono';
+  ctx.fillText(`Prepare: ${(total*1.1).toFixed(3)} bbls (+10%)`, W/2, totY+16);
+
+  // Side labels
+  ctx.fillStyle='#38bdf8'; ctx.font='9px Share Tech Mono'; ctx.textAlign='right';
+  ctx.fillText(`TubID ${tubID}"`, cx-bw/2-5, y1+z1H/2);
+  ctx.fillStyle='#f59e0b'; ctx.textAlign='left';
+  ctx.fillText(`${casID}"−${tubOD}"`, ax+bw+4, y2+z2H/2);
+  ctx.fillStyle='#a78bfa'; ctx.textAlign='right';
+  ctx.fillText(`CasID ${casID}"`, cx-bw/2-5, y3+z3H/2);
+}
+
+// ══════════════════════════════════════
+// PRESSURE CHART
+// ══════════════════════════════════════
+function drawPressChart(owcSS, topPerfSS, topPerfRT, P_owc, P_top_perf, P_res, KWB_final, fluidGrad, rtElev) {
+  const ctx = document.getElementById('pressChart').getContext('2d');
+  // Pressure lines plotted against TVDSS (reservoir reference)
+  // KWB line plotted against TVDRT (brine column reference)
+  const maxD = Math.max(owcSS, topPerfSS) * 1.1;
+  const depths=[], gLine=[], resLine=[], kwbLine=[];
+  for (let dSS = 0; dSS <= maxD; dSS += maxD/60) {
+    depths.push(dSS);
+    const dRT = dSS + rtElev;
+    const depCorr = dSS >= topPerfSS ? (P_res - P_top_perf) : 0;
+    gLine.push(+(fluidGrad * dSS).toFixed(1));
+    resLine.push(+(fluidGrad * dSS + depCorr).toFixed(1));
+    kwbLine.push(+(0.1704 * KWB_final * dRT).toFixed(1));
+  }
+  const gc = 'rgba(56,189,248,.06)', tc = '#64748b';
+  if (pressChartObj) pressChartObj.destroy();
+  pressChartObj = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: depths.map(d => d.toFixed(0)),
+      datasets:[
+        {label:'Fluid gradient pressure (TVDSS ref)', data:gLine, borderColor:'#f59e0b', borderWidth:2, pointRadius:0, tension:.1},
+        {label:'Reservoir pressure (after depletion/OP)', data:resLine, borderColor:'#ef4444',
+          borderWidth:2, borderDash:[6,3], pointRadius:0, tension:.1},
+        {label:`KWB + safety OB (${KWB_final.toFixed(2)} ppg, TVDRT ref)`, data:kwbLine,
+          borderColor:'#22c55e', borderWidth:2.5, pointRadius:0, tension:.1},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index', intersect:false},
+      plugins:{
+        legend:{labels:{color:tc, font:{family:'Share Tech Mono', size:11}, boxWidth:18}},
+        tooltip:{
+          callbacks:{
+            title: i => `TVDSS: ${parseFloat(i[0].label).toFixed(0)}m  (TVDRT: ${(parseFloat(i[0].label)+rtElev).toFixed(0)}m)`,
+            label: i => ` ${i.dataset.label}: ${i.raw} psi`
+          },
+          backgroundColor:'#131d28', borderColor:'#1a2d40', borderWidth:1,
+          titleColor:'#e2e8f0', bodyColor:'#94a3b8',
+          titleFont:{family:'Share Tech Mono', size:11},
+          bodyFont:{family:'Share Tech Mono', size:10}
+        }
+      },
+      scales:{
+        x:{title:{display:true, text:'Depth (m TVDSS) — pressure ref from MSL', color:tc, font:{family:'Share Tech Mono', size:11}},
+          ticks:{color:tc, font:{family:'Share Tech Mono', size:10}, maxTicksLimit:10}, grid:{color:gc}},
+        y:{title:{display:true, text:'Pressure (psi)', color:tc, font:{family:'Share Tech Mono', size:11}},
+          ticks:{color:tc, font:{family:'Share Tech Mono', size:10}}, grid:{color:gc}}
+      }
+    }
+  });
+  document.getElementById('chart-legend').innerHTML = `
+    <span style="color:#f59e0b">■ Fluid gradient (TVDSS)</span>
+    <span style="color:#ef4444">■ Reservoir pressure</span>
+    <span style="color:#22c55e">■ KWB (TVDRT brine column)</span>
+    <span style="color:#64748b;font-size:10px;">Note: Pressure lines use TVDSS ref · KWB line uses TVDRT ref (well is ${rtElev.toFixed(1)}m above MSL)</span>`;
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+window.onload = function() {
+  document.getElementById('jobDate').value = new Date().toLocaleDateString('en-GB');
+  applyField('A');
+  onCasingSelect();
+  // Live TVDRT conversion display
+  ['groundElev','rigHeight','topPerfTVD','eotTVD','tubTop','owcTVD'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateConversions);
+  });
+  ['groundElev','rigHeight'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateRTElev);
+  });
+};
+</script>
+</body>
+</html>
